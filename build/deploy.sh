@@ -6,6 +6,9 @@ npm run build
 # 进入生成的文件夹
 cd docs/.vuepress/dist
 
+# 如果是发布到自定义域名
+# echo 'nirodu.com' > CNAME
+
 git init
 git config user.name 'nirodu'
 git config user.email 'nirodu1219@outlook.com'
