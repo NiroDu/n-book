@@ -1,0 +1,32 @@
+{
+  "name": "niro-front-end-book",
+  "version": "1.0.0",
+  "description": "技术相关的文章集",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "dev": "vuepress dev docs",
+    "build": "vuepress build docs",
+    "deploy": "sh build/deploy.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NiroDu/N-book.git"
+  },
+  "keywords": [
+    "front-end",
+    "javascript",
+    "vue"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NiroDu/N-book/issues"
+  },
+  "homepage": "https://github.com/NiroDu/N-book#readme",
+  "devDependencies": {
+    "vuepress": "^0.14.2"
+  }
+}
