@@ -21,7 +21,7 @@ module.exports = {
         editLinkText: '编辑此页',
         activeHeaderLinks: false,
         sidebarDepth: 3,
-        lastUpdated: 'Last Updated',
+        lastUpdated: '上次更新',
         algolia: {
         },
         // serviceWorker: true,
@@ -48,7 +48,8 @@ module.exports = {
                 title: 'JavaScript 专栏',
                 collapsable: false,
                 children: [
-                    '/javascript/IIFE'
+                    '/javascript/IIFE',
+                    '/javascript/about_js_this',
                 ]
             },
             {
