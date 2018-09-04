@@ -45,4 +45,5 @@ JavaScript 解析器将 `function foo(){ }();` 解析成 `function foo(){ }` 和
 
 ## 参考资料：
 [IIFE - MDN Web Docs Glossary: Definitions of Web-related terms | MDN](https://developer.mozilla.org/en-US/docs/Glossary/IIFE)
+
 [Lucy | JS Immediately Invoked Function Expressions](http://lucybain.com/blog/2014/immediately-invoked-function-expression/)
