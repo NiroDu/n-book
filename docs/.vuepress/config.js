@@ -23,6 +23,8 @@ module.exports = {
         sidebarDepth: 3,
         lastUpdated: '上次更新',
         algolia: {
+            apiKey: 'bd1ffefc1812cbcd64d3e9c78ee883da',
+            indexName: 'n-book'
         },
         nav: [
             { text: 'Blog', link: 'http://nirodu.com' }
