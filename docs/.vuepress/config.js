@@ -23,7 +23,7 @@ module.exports = {
         sidebarDepth: 3,
         lastUpdated: '上次更新',
         algolia: {
-            apiKey: 'bd1ffefc1812cbcd64d3e9c78ee883da',
+            apiKey: '9df1720435cee96eb096180af7efb399',
             indexName: 'n-book'
         },
         nav: [
