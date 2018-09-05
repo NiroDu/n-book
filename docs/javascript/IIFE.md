@@ -1,7 +1,6 @@
-# IIFE (Immediately Invoked Function Expressions)
+# IIFE
 在这里简单的说一说 IIFE (Immediately Invoked Function Expressions)，立即调用函数表达式。
 立即调用函数表达式，也称自执行函数。
-
 
 ## 定义
 > An IIFE (Immediately Invoked Function Expression) is a JavaScript function that runs as soon as it is defined.

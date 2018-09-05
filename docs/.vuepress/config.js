@@ -7,7 +7,7 @@ module.exports = {
     },
     port: 8084,
     head: [
-        ['link', { rel: 'icon', href: `/logo.png` }],
+        ['link', { rel: 'icon', href: `/logo.svg` }],
         ['link', { rel: 'manifest', href: '/manifest.json' }],
         ['meta', { name: 'theme-color', content: '#3eaf7c' }],
         ['meta', { name: 'apple-mobile-web-app-capable', content: 'yes' }],
@@ -24,15 +24,6 @@ module.exports = {
         lastUpdated: '上次更新',
         algolia: {
         },
-        // serviceWorker: true,
-        //   serviceWorker: {
-        //     updatePopup: true, // Boolean | Object, 默认值是 undefined.
-        //     // 如果设置为 true, 默认的文本配置将是: 
-        //     // updatePopup: { 
-        //     //    message: "New content is available.", 
-        //     //    buttonText: "Refresh" 
-        //     // }
-        //   },
         nav: [
             { text: 'Blog', link: 'http://nirodu.com' }
         ],
@@ -48,8 +39,9 @@ module.exports = {
                 title: 'JavaScript 专栏',
                 collapsable: false,
                 children: [
-                    '/javascript/IIFE',
                     '/javascript/about_js_this',
+                    '/javascript/closure',
+                    '/javascript/IIFE',
                 ]
             },
             {
