@@ -7,7 +7,7 @@ module.exports = {
     },
     port: 8084,
     head: [
-        ['link', { rel: 'icon', href: `/logo.svg` }],
+        ['link', { rel: 'icon', href: `/logo.png` }],
         ['link', { rel: 'manifest', href: '/manifest.json' }],
         ['meta', { name: 'theme-color', content: '#3eaf7c' }],
         ['meta', { name: 'apple-mobile-web-app-capable', content: 'yes' }],
@@ -43,6 +43,7 @@ module.exports = {
                 children: [
                     '/javascript/about_js_this',
                     '/javascript/closure',
+                    '/javascript/prototypes_and_prototype_chains',
                     '/javascript/IIFE',
                 ]
             },
