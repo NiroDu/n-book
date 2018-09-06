@@ -1,4 +1,4 @@
-# IIFE
+# IIFE (自执行函数)
 在这里简单的说一说 IIFE (Immediately Invoked Function Expressions)，立即调用函数表达式。
 立即调用函数表达式，也称自执行函数。
 

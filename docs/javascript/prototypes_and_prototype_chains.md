@@ -1,4 +1,4 @@
-# Prototypes and prototype chains
+# Prototypes and prototype chains (原型与原型链)
 
 这篇文章主要解决两个问题：
 1. what’s prototype chains? and how prototype object chains allow objects to inherit features from one another?
@@ -12,7 +12,7 @@
 In JavaScript, a link is made between the object instance and its prototype (its `__proto__` property, which is derived from the prototype property on the constructor), and the properties and methods are found by walking up the chain of prototypes.
 
 ::: warning Note
-It's important to understand that there is a distinction between an **object's prototype** (which is available via Object.getPrototypeOf(obj), or via the deprecated __proto__ property) and **the prototype property on constructor functions**. The former is the property on each instance, and the latter is the property on the constructor. That is, Object.getPrototypeOf(new Foobar()) refers to the same object as Foobar.prototype.
+It's important to understand that there is a distinction between an **object's prototype** (which is available via `Object.getPrototypeOf(obj)`, or via the deprecated __proto__ property) and **the prototype property on constructor functions**. The former is the property on each instance, and the latter is the property on the constructor. That is, `Object.getPrototypeOf(new Foobar())` refers to the same object as `Foobar.prototype`.
 :::
 
 ## Understanding prototype objects
@@ -52,7 +52,7 @@ There isn't officially a way to access an object's prototype object directly —
 This demonstrates `person1.__proto__` and `person1.__proto__.__proto__` structure:
 ![prototype_1](http://pb0ug959r.bkt.clouddn.com/prototype_1.png)
 
-Since ECMAScript 2015 we can access an object's prototype object indirectly via Object.getPrototypeOf(obj).
+Since ECMAScript 2015 we can access an object's prototype object indirectly via `Object.getPrototypeOf(obj)`.
 ![prototype_2](http://pb0ug959r.bkt.clouddn.com/prototype_2.png)
 
 ## The prototype property: Where inherited members are defined
