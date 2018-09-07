@@ -44,7 +44,8 @@ module.exports = {
                     '/javascript/about_js_this',
                     '/javascript/closure',
                     '/javascript/prototypes_and_prototype_chains',
-                    '/javascript/inheritance_and_prototype_chain',
+                    '/javascript/inheritance_and_prototype_chain1',
+                    '/javascript/inheritance_and_prototype_chain2',
                     '/javascript/iife',
                 ]
             },

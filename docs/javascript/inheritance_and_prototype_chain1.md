@@ -1,4 +1,4 @@
-# Inheritance and the prototype chain (继承与原型链)
+# Inheritance and the prototype chain 1 (继承与原型链 - 上)
 
 ## 写在前面
 (the `class` keyword is introduced in ES2015, but is syntactical sugar, JavaScript remains prototype-based).
