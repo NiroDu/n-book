@@ -40,25 +40,6 @@ function Teacher(first, last, age, gender, interests, subject) {
 
 We want the `Teacher()` constructor to take the same parameters as the `Person()` constructor it is inheriting from, so we specify them all as parameters in the `call()` invocation.
 
-## Inheriting from a constructor with no parameters
-Note that if the constructor you are inheriting from doesn't take its property values from parameters, you don't need to specify them as additional arguments in `call()`. 
-```js
-function Brick() {
-  this.width = 10;
-  this.height = 20;
-}
-```
-You could inherit the `width` and `height` properties by doing this:
-```js
-function BlueGlassBrick() {
-  Brick.call(this);
-
-  this.opacity = 0.5;
-  this.color = 'blue';
-}
-```
-Note that we've only specified `this` inside `call()` — no other parameters are required as we are not inheriting any properties from the parent that are set via parameters.
-
 ## Setting Teacher()'s prototype and constructor reference
 But we have a problem. We have defined a new constructor —— `Teacher`, and it has a prototype property, which by default just contains a reference to the constructor function itself. It does not contain the methods of the `Person` constructor's prototype property.
 
@@ -90,8 +71,95 @@ Teacher.prototype.greeting = function() {
 };
 ```
 
-## ECMAScript 2015 Classes
-用类的方式去实现继承。
+## Inheriting from a constructor with no parameters
+Note that if the constructor you are inheriting from doesn't take its property values from parameters, you don't need to specify them as additional arguments in `call()`. 
+```js
+function Brick() {
+  this.width = 10;
+  this.height = 20;
+}
+```
+You could inherit the `width` and `height` properties by doing this:
+```js
+function BlueGlassBrick() {
+  Brick.call(this);
+
+  this.opacity = 0.5;
+  this.color = 'blue';
+}
+```
+Note that we've only specified `this` inside `call()` — no other parameters are required as we are not inheriting any properties from the parent that are set via parameters.
+
+## ES6 Classes
+### rewritten version with class-style
+we'll convert the `Person and Teacher examples` from prototypal inheritance to classes, to show you how it's done:
+Let's look at a rewritten version of the Person example, class-style:
+```js
+class Person {
+	// The constructor() method defines the constructor function that represents our Person class.
+  constructor(first, last, age, gender, interests) {
+    this.name = {
+      first,
+      last
+    };
+    this.age = age;
+    this.gender = gender;
+    this.interests = interests;
+  }
+	// greeting() is class methods.
+  greeting() {
+    console.log(`Hi! I'm ${this.name.first}`);
+  };
+}
+```
+
+We can now instantiate object instances using the `new` operator, in just the same way as we did before:
+```js
+let han = new Person('Han', 'Solo', 25, 'male', ['Smuggling']);
+han.greeting(); // Hi! I'm Han
+```
+
+### Inheritance with class syntax
+we'll create our specialized `Teacher` class, making it inherit from `Person` using modern class syntax.
+To create a subclass we use the `extends` keyword to tell JavaScript the class we want to base our class on.
+```js
+class Teacher extends Person {
+  constructor(first, last, age, gender, interests, subject, grade) {
+    this.name = {
+      first,
+      last
+    };
+  this.age = age;
+  this.gender = gender;
+  this.interests = interests;
+  // subject and grade are specific to Teacher
+  this.subject = subject;
+  this.grade = grade;
+  }
+}
+```
+
+重复声明`Person`的属性显然是不必要的，我们可以使用`super`关键词来简化代码：
+> the `super()` operator as the first item inside the `constructor()`. **This will call the parent class’ constructor, and inherit the members we specify as parameters of `super()`**
+```js
+class Teacher extends Person {
+  constructor(first, last, age, gender, interests, subject, grade) {
+    super(first, last, age, gender, interests);
+
+    // subject and grade are specific to Teacher
+    this.subject = subject;
+    this.grade = grade;
+  }
+}
+```
+
+When we instantiate Teacher object instances, we can now call methods and properties defined on both `Teacher` and `Person`, as we'd expect:
+```js
+let snape = new Teacher('Severus', 'Snape', 58, 'male', ['Potions'], 'Dark arts', 5);
+snape.greeting(); // Hi! I'm Severus.
+snape.age // 58
+snape.subject; // Dark arts
+```
 
 ## 参考资料
 [Inheritance in JavaScript - Learn web development | MDN](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/Inheritance)
