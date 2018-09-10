@@ -71,25 +71,6 @@ Teacher.prototype.greeting = function() {
 };
 ```
 
-## Inheriting from a constructor with no parameters
-Note that if the constructor you are inheriting from doesn't take its property values from parameters, you don't need to specify them as additional arguments in `call()`. 
-```js
-function Brick() {
-  this.width = 10;
-  this.height = 20;
-}
-```
-You could inherit the `width` and `height` properties by doing this:
-```js
-function BlueGlassBrick() {
-  Brick.call(this);
-
-  this.opacity = 0.5;
-  this.color = 'blue';
-}
-```
-Note that we've only specified `this` inside `call()` — no other parameters are required as we are not inheriting any properties from the parent that are set via parameters.
-
 ## ES6 Classes
 ### rewritten version with class-style
 we'll convert the `Person and Teacher examples` from prototypal inheritance to classes, to show you how it's done:
@@ -160,6 +141,25 @@ snape.greeting(); // Hi! I'm Severus.
 snape.age // 58
 snape.subject; // Dark arts
 ```
+
+## Inheriting from a constructor with no parameters
+Note that if the constructor you are inheriting from doesn't take its property values from parameters, you don't need to specify them as additional arguments in `call()`. 
+```js
+function Brick() {
+  this.width = 10;
+  this.height = 20;
+}
+```
+You could inherit the `width` and `height` properties by doing this:
+```js
+function BlueGlassBrick() {
+  Brick.call(this);
+
+  this.opacity = 0.5;
+  this.color = 'blue';
+}
+```
+Note that we've only specified `this` inside `call()` — no other parameters are required as we are not inheriting any properties from the parent that are set via parameters.
 
 ## 参考资料
 [Inheritance in JavaScript - Learn web development | MDN](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/Inheritance)
