@@ -2,7 +2,9 @@
 
 ## 总览
 JS 里有两种任务类型：
+
 macroTask（宏任务）: `setTimeout`, `setInterval`, `setImmediate`, `requestAnimationFrame`, `user Input/Output`, `UI rendering`
+
 microTask（微任务）: `process.nextTick`, `Promise`, `Object.observe`, `MutaionObserver`
 
 Event Loop的示意图：
