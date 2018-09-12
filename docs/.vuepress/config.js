@@ -48,6 +48,7 @@ module.exports = {
                     '/javascript/inheritance_and_prototype_chain2',
                     '/javascript/event_loop',
                     '/javascript/promise',
+                    '/javascript/asynchronous_function',
                     '/javascript/es6_classes',
                     '/javascript/iife',
                 ]
