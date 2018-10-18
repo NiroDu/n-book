@@ -214,7 +214,7 @@ async function dbFuc(db) {
 }
 ```
 
-## 参考资料：
+## 参考资料
 [async function - JavaScript | MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function)
 
 [async 函数的含义和用法 - 阮一峰的网络日志](http://www.ruanyifeng.com/blog/2015/05/async.html)
