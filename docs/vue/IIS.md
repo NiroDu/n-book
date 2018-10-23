@@ -4,7 +4,7 @@
 正确的如下，把web.config放到项目的index.html同级：
 
 web.config 文件
-```bash
+```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
   <system.webServer>

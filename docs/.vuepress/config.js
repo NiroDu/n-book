@@ -63,7 +63,10 @@ module.exports = {
             {
                 title: 'TypeScript 专栏',
                 collapsable: false,
-                children: []
+                children: [
+                    "/typescript/basic_usage.md",
+                    "/typescript/advanced_usage.md",
+                ]
             },
         ]
     }
