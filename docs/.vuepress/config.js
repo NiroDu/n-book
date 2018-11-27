@@ -54,6 +54,15 @@ module.exports = {
                 ]
             },
             {
+                title: 'React 专栏',
+                collapsable: false,
+                children: [
+                    '/react/react-basic',
+                    '/react/redux-basic',
+                    '/react/redux-intermediate',
+                ]
+            },
+            {
                 title: 'Vue 专栏',
                 collapsable: false,
                 children: [
