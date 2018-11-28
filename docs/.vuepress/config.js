@@ -57,9 +57,9 @@ module.exports = {
                 title: 'React 专栏',
                 collapsable: false,
                 children: [
-                    '/react/react-basic',
-                    '/react/redux-basic',
-                    '/react/redux-intermediate',
+                    '/react/react_basic',
+                    '/react/redux_basic',
+                    '/react/redux_intermediate',
                 ]
             },
             {

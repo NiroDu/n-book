@@ -1,13 +1,12 @@
 # Redux 基础部分
 
-![图片](https://images-cdn.shimo.im/p7bxoNmqFf8z0qDb/image.png!thumbnail)
-
-![图片](https://images-cdn.shimo.im/09pHD6cB3B8aSFm6/image.png!thumbnail)
+![redux_work_flow_1](./images/redux_basic/redux_work_flow_1.png)
+![redux_work_flow_2](./images/redux_basic/redux_work_flow_2.png)
 Redux 是 Flux 框架的改良，新引入了 Reducer 这个概念。
 
 ## Redux 工作流程
 
-![图片](https://images-cdn.shimo.im/wIrEZ9sPykgUYMk6/image.png!thumbnail)
+![redux_work_flow_3](./images/redux_basic/redux_work_flow_3.png)
 举个例子：
 
 Store 是图书管理员
@@ -68,7 +67,7 @@ class TodoList extends Component {
 
 官网用法：[https://github.com/zalmoxisus/redux-devtools-extension#usage](https://github.com/zalmoxisus/redux-devtools-extension#usage)
 
-![图片](https://images-cdn.shimo.im/KtDxc5CtYrgLy5Cj/image.png!thumbnail)
+![redux_dev_tool](./images/redux_basic/redux_dev_tool.png)
 
 在 createStore 函数中把以上参数带过去工具才能正常运行。
 
@@ -148,7 +147,7 @@ handleStoreChange() {
 store 会自动把接收到的 action 和当前的 state 传给 reducer，reducer 处理完后，再返回新的 state 给 store，store 里的数据被更新
 （注意，是 store 对自己的数据进行更新，而不是 reducer 更新的），再返回给 components ，components 订阅 store 更新随之视图更新 。
 
-![图片](https://images-cdn.shimo.im/k2ZI8aGNQ48BU28R/image.png!thumbnail)
+![redux_work_flow_4](./images/redux_basic/redux_work_flow_4.png)
 
 ## ActionTypes 的拆分
 
