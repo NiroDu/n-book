@@ -32,7 +32,7 @@ var person1 = new Person('Bob', 'Smith', 32, 'male', ['music', 'skiing']);
 ```
 
 This demonstrates the prototype chain working.
-![prototype_0](http://pb0ug959r.bkt.clouddn.com/prototype_0.png)
+![prototype_0](./images/prototypes_and_prototype_chains/prototype_0.png)
 
 So what happens if you call a method on person1, which is actually defined on Object?
 For example:
@@ -50,10 +50,10 @@ There isn't officially a way to access an object's prototype object directly —
 :::
 
 This demonstrates `person1.__proto__` and `person1.__proto__.__proto__` structure:
-![prototype_1](http://pb0ug959r.bkt.clouddn.com/prototype_1.png)
+![prototype_1](./images/prototypes_and_prototype_chains/prototype_1.png)
 
 Since ECMAScript 2015 we can access an object's prototype object indirectly via `Object.getPrototypeOf(obj)`.
-![prototype_2](http://pb0ug959r.bkt.clouddn.com/prototype_2.png)
+![prototype_2](./images/prototypes_and_prototype_chains/prototype_2.png)
 
 ## The prototype property: Where inherited members are defined
 我们可以在看到 [这里](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object) 很多的 Object’s Methods.
@@ -80,7 +80,7 @@ Person.prototype
 Object.prototype
 ```
 
-![prototype_3](http://pb0ug959r.bkt.clouddn.com/prototype_3.png)
+![prototype_3](./images/prototypes_and_prototype_chains/prototype_3.png)
 
 You'll see a large number of methods defined on **Object's prototype property**, which are then available on objects that inherit from Object, as shown earlier.
 
@@ -104,7 +104,7 @@ person2.__proto__
 ```
 This will return the `person1`.
 
-![prototype_4](http://pb0ug959r.bkt.clouddn.com/prototype_4.png)
+![prototype_4](./images/prototypes_and_prototype_chains/prototype_4.png)
 
 ## The constructor property
 Properties defined on the **Person.prototype property** become available to all the instance objects created using the **Person() constructor**. Hence, the constructor property is also available to both `person1` and `person2` objects.
@@ -115,7 +115,7 @@ person1.constructor
 person2.constructor
 // These should both return the Person() constructor, as it contains the original definition of these instances.
 ```
-![prototype_5](http://pb0ug959r.bkt.clouddn.com/prototype_5.png)
+![prototype_5](./images/prototypes_and_prototype_chains/prototype_5.png)
 
 The constructor property has other uses. For example, if you have an object instance and you want to return the name of the constructor it is an instance of, you can use the following:
 ```js

@@ -21,7 +21,7 @@ A `pending` promise can either be `fulfilled` with a value, or `rejected` with a
 
 （`then` 方法包含两个参数：`onfulfilled` 和 `onrejected`，它们都是 Function 类型。当 Promise 状态为 fulfilled 时，调用 then 的 onfulfilled 方法，当 Promise 状态为 rejected 时，调用 then 的 onrejected 方法， 在异步操作的完成和绑定处理方法之间不存在竞争）
 
-![promises](http://pb0ug959r.bkt.clouddn.com/promises.png)
+![promises](./images/promises/promises.png)
 
 :::warning Note
 Promise对象的状态改变，只有两种可能：从pending变为fulfilled和从pending变为rejected。只要这两种情况发生，状态就凝固了，不会再变了，会一直保持这个结果，这时就称为 resolved（已定型）。如果改变已经发生了，你再对Promise对象添加回调函数，也会立即得到这个结果。

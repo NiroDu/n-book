@@ -256,7 +256,7 @@ ReactDOM.render(App, document.getElementById("root"));
 ```
 
 /TodoList.js
-![图片](https://images-cdn.shimo.im/8hgEpmjYYS864KDI/image.png!thumbnail)
+![map_to_props_1](./images/redux_intermediate/map_to_props_1.png)
 
 **mapStateToProps**：把 Store 里的 state 映射成 组件里的 props。
 
@@ -266,7 +266,7 @@ ReactDOM.render(App, document.getElementById("root"));
 
 /TodoList.js
 两个 map 映射 store 和 dispatch 给到了 props，所以这个组件里上部分的代码可以直接这么写：
-![图片](https://images-cdn.shimo.im/5xCV5I3vpE0xeRzj/image.png!thumbnail)
+![map_to_props_2](./images/redux_intermediate/map_to_props_2.png)
 
 刚刚在组件 changeInputValue 方法里 dispatch 出的 action， reducer 和之前一样正常写。
 ```jsx

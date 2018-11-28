@@ -8,7 +8,7 @@ macroTask（宏任务）: `setTimeout`, `setInterval`, `setImmediate`, `requestA
 microTask（微任务）: `process.nextTick`, `Promise`, `Object.observe`, `MutaionObserver`
 
 Event Loop的示意图：
-![event_loop_0](http://pb0ug959r.bkt.clouddn.com/event_loop_0.jpg)
+![event_loop_1](./images/event_loop/event_loop_1.jpg)
 
 总的来说，执行顺序是
 

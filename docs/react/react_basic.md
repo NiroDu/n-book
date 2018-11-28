@@ -32,8 +32,7 @@ registerServiceWorker();
 ```
 
 ## 组件化
-
-![图片](https://images-cdn.shimo.im/E69CI6CrHGAcrC7O/image.png)
+![componentization](./images/react_basic/componentization.png)
 
 ```js
 import { Component } from "react";
@@ -42,7 +41,7 @@ import React from "react";
 const Component = React.Component;
 ```
 
-## 3-2 React 中的响应式设计思想和事件绑定
+## React 中的响应式设计思想和事件绑定
 
 在原生 JS 中 **onchange**，在 JSX 中是 **onChange**
 
@@ -113,7 +112,7 @@ handleItemDelete(index) {
 
 immutable 不可变，我们不能直接去改变 state 的值，必须通过 setState 方法。
 
-## 3-4 JSX 语法细节补充
+## JSX 语法细节补充
 
 ### JSX 里怎么写注释
 
@@ -177,7 +176,7 @@ class Detail extends Component {
 这样容易受到造成 XSS 攻击。
 官方的解释：[https://reactjs.org/docs/dom-elements.html](https://reactjs.org/docs/dom-elements.html)
 
-## 3-5 父子组件传值
+## 父子组件传值
 
 父组件传给子组件：
 
@@ -241,7 +240,7 @@ class TodoItem extends Component {
 }
 ```
 
-## 3-6 上述代码优化
+## 上述代码优化
 
 解构赋值。
 
@@ -316,7 +315,7 @@ handleItemDelete(index) {
 }
 ```
 
-## 4-2 PropTypes 与 DefaultProps 的应用
+## PropTypes 与 DefaultProps 的应用
 
 引入：
 
@@ -351,13 +350,13 @@ optionalArrayOf: PropTypes.oneOfType([PropTypes.number,PropTypes.string]),
 
 详细用法：[https://reactjs.org/docs/typechecking-with-proptypes.html](https://reactjs.org/docs/typechecking-with-proptypes.html)
 
-## 4-3 props，state 与 render 函数的关系
+## props，state 与 render 函数的关系
 
 1. 当组件的 state 或者 props 发生改变的时候，render 函数就会重新执行。
 
 2. 当父组件的 render 函数被运行时，它的子组件的 render 都将被重新运行一次。
 
-## 4-4 React 中的虚拟 DOM 的生成过程
+## React 中的虚拟 DOM 的生成过程
 **普通方案一：**
 1. state 数据
 2. JSX 模版
@@ -405,7 +404,7 @@ optionalArrayOf: PropTypes.oneOfType([PropTypes.number,PropTypes.string]),
 
 **状态改变后：生成的是新的虚拟 DOM 而不是真实 DOM，以及对比的是虚拟 DOM 而不是真实 DOM，所以性能极大提升。**
 
-## 4-5 深入了解虚拟 DOM
+## 深入了解虚拟 DOM
 ```jsx
 render() {
   // JSX -> createElemnt ->  虚拟DOM（JS 对象） -> 真实的DOM
@@ -421,26 +420,24 @@ React.createElement() 第一个参数是 DOM 节点，第二个参数是 DOM 节
 1. 性能的极大提升。
 2. 使得可以用 React Native 去写原生应用。因为原生应用里是没有 DOM 这种概念的，但是通过虚拟 DOM 可以去转化成原生应用的语法。
 
-## 4-6 虚拟 DOM 中的 Diff 算法
+## 虚拟 DOM 中的 Diff 算法
 
 ### setState()为什么要设置成异步函数？
 
 为了提升性能，例如将连续的三次 setState 执行合并成一次，只需要对比一次虚拟 DOM，节省了两次的消耗。同步的话就会执行三次对比。
-![图片](https://images-cdn.shimo.im/EbuzDdAimEgw9Kdh/image.png!thumbnail)
+![set_state](./images/react_basic/set_state.png)
 
 ### diff 算法 - 同层虚拟 DOM 比对
-
-![图片](https://images-cdn.shimo.im/aDb8Msbtdosj82Ly/image.png!thumbnail)
+![diff](./images/react_basic/diff.png)
 同层比对算法简单，比对速度快。
 假如虚拟 DOM 的对比中，红框中的节点对比发现不同，则**直接把旧的真实 DOM 红框节点下的元素全删除，再重新渲染为新的虚拟 DOM 中的内容**。
 虽然可能会造成 DOM 重新渲染时的浪费，但是它大大减少了两个虚拟 DOM 比对算法之间的性能消耗。
 
 ### 为什么不推荐循环中设置 index 为 key？
-
-![图片](https://images-cdn.shimo.im/tfXH6kC74o4r0gzX/image.png!thumbnail)
+![key](./images/react_basic/key.png)
 所以为什么说不要设置循环中的 key 值为 index，因为这样就没法保证新生成的虚拟 dom 上的 key 和旧的虚拟 dom 上的 key 是同一个值了。这样在新旧虚拟 DOM 对比时的造成了难度的提升。
 
-## 4-7 React 中的 Ref
+## React 中的 Ref
 
 ### 什么是 Ref？
 
@@ -502,9 +499,8 @@ handleBtnClick() {
 }
 ```
 
-## 4-8 React 的生命周期函数
-
-![图片](https://images-cdn.shimo.im/0oNFfGinwhsiHCue/image.png!thumbnail)
+## React 的生命周期函数
+![the_life_cycle](./images/react_basic/the_life_cycle.png)
 
 ### initialization 阶段：
 
@@ -580,13 +576,13 @@ componentWillUnmount() {
 ```
 ### 一个问题
 **删除子组件的流程：**
-![图片](https://images-cdn.shimo.im/6RisrewAwWwtpGuG/image.png!thumbnail)
+![delete](./images/react_basic/delete.png)
 
 **Qusetion: 生命周期函数componentWillUnmount执行的时候，控制台是先输出了parent render，然后才是child componentWillUnmount。但是parent render执行完了之后，显示DOM的内容不是已经删除后的样子吗？这样的话，感觉是执行 omponentWillUnmount后执行parent render 才对。**
 
 理解：在 parent render 完后，按理说是到 child render，但是因为 child 即将被删除，所以不需要重新再为 child 执行一次 render，而是直接 child componentwillUnmount，结束此次渲染。另外，render 永远在 componentWillUnmount之前执行。
 
-## 4-9 React 生命周期函数的使用场景
+## React 生命周期函数的使用场景
 
 ### 父组件 render，子组件也会随之 render 的优化方案
 写在子组件中，当父组件传来的值和当前的值不一样，才更新(true)。否则不更新。
@@ -625,9 +621,8 @@ render() {
 
 一般的从后台(服务器)获取的数据，都会与组件上要用的数据加载有关，所以都在 componentDidMount 方法里面做。虽然与组件上的数据无关的加载，也可以在 constructor 里作，但 constructor 是作组件 state 初绐化工作，并不是设计来作加载数据这工作的，所以所有有副作用的代码都会集中在 componentDidMount 方法里。
 
-## 4-10 使用 Charles 实现本地数据 mock
-
-![Charles](https://images-cdn.shimo.im/xOOCVOAAYQYlZtvE/image.png!thumbnail)
+## 使用 Charles 实现本地数据 mock
+![charles](./images/react_basic/charles.png)
 
 如果不打算在代码里写反向代理的话，可以用这款软件做代理。
 
@@ -635,7 +630,7 @@ tools - map local 选项，如上个图配置。
 
 ajax打接口`http://localhost:3000/api/todolist`的话，Charles会把桌面上的 todolist.json 中的内容做代理返回。
 
-## 4-13/14 使用 react-transition-group 实现动画
+## 使用 react-transition-group 实现动画
 
 官方文档：[http://reactcommunity.org/react-transition-group/](http://reactcommunity.org/react-transition-group/)
 

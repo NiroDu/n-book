@@ -44,8 +44,8 @@ module.exports = {
                     '/javascript/about_js_this',
                     '/javascript/closure',
                     '/javascript/prototypes_and_prototype_chains',
-                    '/javascript/inheritance_and_prototype_chain1',
-                    '/javascript/inheritance_and_prototype_chain2',
+                    '/javascript/inheritance_and_prototype_chain_1',
+                    '/javascript/inheritance_and_prototype_chain_2',
                     '/javascript/event_loop',
                     '/javascript/promise',
                     '/javascript/asynchronous_function',
@@ -60,6 +60,8 @@ module.exports = {
                     '/react/react_basic',
                     '/react/redux_basic',
                     '/react/redux_intermediate',
+                    '/react/libs_with_react',
+                    '/react/react_ssr',
                 ]
             },
             {

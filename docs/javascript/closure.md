@@ -107,7 +107,7 @@ console.log(counter.value()); // logs 1
 ```
 
 控制台输出`counter`，`counter`是一个 Closure：
-![counter](http://pb0ug959r.bkt.clouddn.com/closure_example_2.png)
+![counter](./images/closure/closure_1.png)
 
 we create a single lexical environment that is shared by three functions: `counter.increment`, `counter.decrement`, and `counter.value`.（这三个函数同时也是闭包，共享同一个词法作用域）
 

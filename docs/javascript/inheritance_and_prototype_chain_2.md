@@ -43,7 +43,7 @@ We want the `Teacher()` constructor to take the same parameters as the `Person()
 ## Setting Teacher()'s prototype and constructor reference
 But we have a problem. We have defined a new constructor —— `Teacher`, and it has a prototype property, which by default just contains a reference to the constructor function itself. It does not contain the methods of the `Person` constructor's prototype property.
 
-![Inheritance_01](http://pb0ug959r.bkt.clouddn.com/Inheritance_01.png)
+![inheritance_01](./images/inheritance_and_prototype_chain_2/inheritance_01.png)
 
 并且比较`Person.prototype`和`Teacher.prototype`上的`property`，我们发现`Teacher`并没有继承`Person.prototype.greeting`。
 
@@ -58,7 +58,7 @@ Teacher.prototype = Object.create(Person.prototype);
 Teacher.prototype.constructor = Teacher;
 ```
 
-![Inheritance_02](http://pb0ug959r.bkt.clouddn.com/Inheritance_02.png)
+![inheritance_02](./images/inheritance_and_prototype_chain_2/inheritance_02.png)
 
 Entering  `Teacher.prototype.constructor `should return `Teacher()`, as desired, plus we are now inheriting from `Person()`!
 
