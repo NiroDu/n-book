@@ -1,6 +1,7 @@
 # Libs with React
 # 使用 styled-components
 使用这个第三方工具来写 css，好处是可以组件化。
+
 文档：[https://github.com/styled-components/styled-components](https://github.com/styled-components/styled-components)
 
 ```jsx
@@ -41,7 +42,35 @@ export const Logo = styled.a.attrs({
 ```
 ## 怎样接收外部变量？
 因为它的本质是一个StyledComponent对象组件，从组件外部接收变量，就和正常的React一样传递，在 style.js 里用 props 接收：
+
+```jsx
+import styled from 'styled-components';
+
+export const RecommendItem = styled.div`
+	width: 280px;
+	height: 50px;
+	background: url(${(props) => props.imgUrl});
+	background-size: contain;
+`;
+```
+```jsx
+class Recommend extends Component {
+	render() {
+		return (
+			<RecommendWrapper>
+				{
+					this.props.list.map((item) => {
+						return <RecommendItem imgUrl={item.get('imgUrl')} key={item.get('id')}/>
+					})
+				}
+			</RecommendWrapper>
+		)
+	}
+}
+```
+
 ![图片](https://images-cdn.shimo.im/gSOYYUBZZIIyZ9Ne/image.png!thumbnail)![图片](https://images-cdn.shimo.im/CRGFqTqr4pwiMOAd/image.png!thumbnail)
+
 ## StyledComponent 对象
 一个元素是 styled-components 渲染出来的话，那它是 StyledComponent 对象。
 用 ref 去获取只能获取到 StyledComponent 对象而不是 DOM。
