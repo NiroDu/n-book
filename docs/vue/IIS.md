@@ -1,6 +1,9 @@
 # Vue HTML5 History 模式 (IIS)配置文件
 
-[HTML5 History 模式 · vue-router](https://router.vuejs.org/zh-cn/essentials/history-mode.html) 这里的IIS后端配置文件是有问题的。
+[HTML5 History 模式 · vue-router](https://router.vuejs.org/zh-cn/essentials/history-mode.html)
+
+这里的IIS后端配置文件是有问题的。
+
 正确的如下，把web.config放到项目的index.html同级：
 
 web.config 文件
