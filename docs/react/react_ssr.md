@@ -646,7 +646,7 @@ export const render = req => {
 
 接下来我们要让服务器端也能预先执行去获取数据，进行服务器端渲染，直接把获取到数据的页面返回来。
 
-### 异步数据服务器渲染： loadData 方法及路由重构
+### 异步数据服务器渲染：loadData 方法及路由重构
 
 文档：[https://reacttraining.com/react-router/web/guides/server-rendering](https://reacttraining.com/react-router/web/guides/server-rendering)
 
@@ -716,6 +716,7 @@ export default (
 ```
 
 react-router 提供了服务器端渲染所需方法，这时候需要返回一个数组，里面的一个个对象对应着一个个路由。
+
 改写后的 server/src/Routes.js
 ```jsx
 // 当我加载显示HOME组件之前，我希望调用Home.loadData方法，提前获取到必要的异步数据
@@ -739,10 +740,29 @@ export default [
 当加载显示 HOME 组件之前，我们希望调用 Home.loadData 方法，提前获取到必要的异步数据。然后再做服务器端渲染，把页面返回给用户。
 
 与之对应的还要去修改引用了路由的地方(因为原来返回 Route 对象，现在只返回了一个数组)。
-server/src/client/index.js
+```jsx{12}
+// server/src/client/index.js
+// ...
+import routes from "../Routes";
 
-![图片](https://images-cdn.shimo.im/wl1cRi5K1V0iq6Rr/image.png!thumbnail)server/src/server/utils.js
-同理。
+const App = () => {
+  return (
+    <Provider store={getStore()}>
+      <BrowserRouter>
+        <div>
+          {/*遍历生成新的Route组件*/}
+          {routes.map(route => (
+            <Route {...route} />
+          ))}
+        </div>
+      </BrowserRouter>
+    </Provider>
+  );
+};
+// ...
+```
+
+server/src/server/utils.js 同理。
 
 然后我们去修改服务器端渲染前的文件，使其能获取到用户当前访问的地址+路由。
 server/src/server/utils.js
