@@ -45,7 +45,7 @@ export default store;
 this.state = store.getState();
 就可以把 store 里的值放到 this.state 里去，并在下方使用：
 
-```jsx{4,11,14}
+```jsx {4,11,14}
 class TodoList extends Component {
   constructor(props) {
     super(props);
@@ -86,7 +86,7 @@ const store = createStore(
 
 **在 React 中，store 接收到 action 后会自动的把 action 转发给 reducer，让 reducer 来处理并返回值给 store。**
 
-```jsx{6}
+```jsx {6}
 handleInputChange(e) {
   const action = {
     type: "change_input_value",
@@ -97,7 +97,7 @@ handleInputChange(e) {
 ```
 
 Reducer 的处理：
-```jsx{10,11,12}
+```jsx {10,11,12}
 // store/reducer.js
 const defaultState = {
   inputValue: "123",
@@ -117,7 +117,7 @@ export default (state = defaultState, action) => {
 reducer 不能直接去更新 state 的值，所以深拷贝了一个副本进行修改，再返回新的 state 给 store。
 
 store 接收到新的 state 之后，应该去更新 components 视图，components 使用 store.subscribe(F) 订阅 store 状态，store 一更新 components 就会自动执行方法 F。
-```jsx{10}
+```jsx {10}
 import store from "./store";
 
 class TodoList extends Component {
@@ -134,7 +134,7 @@ class TodoList extends Component {
 ```
 
 方法更新，components 设置新的 state 值为 store 里的值，再重新执行 render 函数更新视图。
-```jsx{2}
+```jsx {2}
 handleStoreChange() {
 	this.setState(store.getState());
 }

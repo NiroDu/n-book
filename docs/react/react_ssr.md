@@ -249,7 +249,7 @@ yarn global add npm-run-all
 
 可以用 webpack-merge 去合并 webpack 中重复的配置项。
 
-```js{31}
+```js {31}
 // server/webpack.server.js
 const path = require("path");
 const nodeExternals = require("webpack-node-externals");
@@ -289,7 +289,7 @@ ReactDOM.render(<App />, document.getElementById("root"));
 
 但 react-dom 提供了服务器端渲染的方法：**renderToString**
 
-```jsx{6,9,18}
+```jsx {6,9,18}
 // server/src/index.js
 import express from "express";
 import Home from "./containers/Home";
@@ -329,7 +329,7 @@ var server = app.listen(3000);
 
 假如我们想点击 button 时执行绑定在上面的 JS 语句，但服务器渲染时，组件上绑定的 JS 语句返回给客户端时会被删掉。
 
-```jsx{8}
+```jsx {8}
 // server/src/containers/Home/index.js
 import React from "react";
 
@@ -393,7 +393,7 @@ app.use(express.static("public"));
 
 使用 use() 使用中间件，`express.static('public')` 意思是假如访问的是一个静态文件，就会到根目录下的 public 文件夹去获取资源。我们在 webpack 配置了客户端的文件会被打包到 public 文件夹下，这样就有了解决的一种方式：
 
-```jsx{10}
+```jsx {10}
 // ...
 app.get("/", function(req, res) {
   res.send(`
@@ -472,7 +472,7 @@ export default (
 
 客户端使用 BrowserRouter 进行客户端路由渲染。
 
-```jsx{8}
+```jsx {8}
 // /server/src/client/index.js
 import React from "react";
 import ReactDom from "react-dom";
@@ -488,7 +488,7 @@ ReactDom.hydrate(<App />, document.getElementById("root"));
 
 服务器端 express 监听所有路由路径，并且把要渲染的内容封装成一个 render 方法（优化策略）。
 
-```jsx{8}
+```jsx {8}
 // server/src/server/index.js
 import express from "express";
 import { render } from "./utils";
@@ -505,7 +505,7 @@ var server = app.listen(3000);
 
 req 是 express 监听到路由变更时的一个大对象，其中 req.path 是当前 url 的 pathname。
 
-```jsx{10}
+```jsx {10}
 // server/src/server/utils.js
 import React from "react";
 import { renderToString } from "react-dom/server";
@@ -570,7 +570,7 @@ A: 涉及到**单例**的问题，在服务器端直接返回一个 store 对象
 
 客户端引入
 
-```jsx{11}
+```jsx {11}
 // server/src/client/index.js
 import React from "react";
 import ReactDom from "react-dom";
@@ -592,7 +592,7 @@ ReactDom.hydrate(<App />, document.getElementById("root"));
 
 服务器端引入
 
-```jsx{11}
+```jsx {11}
 // server/src/server/utils.js
 import React from "react";
 import { renderToString } from "react-dom/server";
@@ -642,7 +642,7 @@ export const render = req => {
 
 6. 客户端渲染出 store 中 list 数据对应的列表内容
 
-**componentDidMount只会在客户端上执行，在服务端上不会执行**。所以页面的列表内容都是客户端渲染出来的。
+**componentDidMount 只会在客户端上执行，在服务端上不会执行**。所以页面的列表内容都是客户端渲染出来的。
 
 接下来我们要让服务器端也能预先执行去获取数据，进行服务器端渲染，直接把获取到数据的页面返回来。
 
@@ -650,7 +650,7 @@ export const render = req => {
 
 文档：[https://reacttraining.com/react-router/web/guides/server-rendering](https://reacttraining.com/react-router/web/guides/server-rendering)
 
-```jsx{6,10}
+```jsx {6,10}
 // server/src/server/utils.js
 // ...
 import getStore from '../store';
@@ -680,6 +680,7 @@ export const render = (req) => {
   `;
 // ...
 ```
+
 想实现服务端渲染异步数据，那需要在服务端渲染前拿到异步数据。
 
 store 里填充的是什么，我们需要结合当前用户请求的地址+路由来做判断。
@@ -693,54 +694,60 @@ store 里填充的是什么，我们需要结合当前用户请求的地址+路�
 **第二步，获取到组件相关数据后，填充到 store 中，然后进行服务器端渲染。**
 
 我们先来做第一步的内容。
+
 ```jsx
 // server/src/containers/Home/index.js
 class Home extends Component {
   // ...
 }
 Home.loadData = () => {
-	// 这个函数，负责在服务器端渲染之前，把这个路由需要的数据提前加载好
-}
+  // 这个函数，负责在服务器端渲染之前，把这个路由需要的数据提前加载好
+};
 ```
 
 为了实现 根据路由的不同来获取该路由所对应组件的异步数据，我们需要改造路由的写法。
 
 原来的 server/src/Routes.js
+
 ```jsx
 export default (
   <div>
-    <Route path='/' exact component={Home}></Route>
-    <Route path='/login' exact component={Login}></Route>
+    <Route path="/" exact component={Home} />
+    <Route path="/login" exact component={Login} />
   </div>
-)
+);
 ```
 
 react-router 提供了服务器端渲染所需方法，这时候需要返回一个数组，里面的一个个对象对应着一个个路由。
 
 改写后的 server/src/Routes.js
+
 ```jsx
 // 当我加载显示HOME组件之前，我希望调用Home.loadData方法，提前获取到必要的异步数据
 // 然后再做服务器端渲染，把页面返回给用户
 export default [
-  { 
-    path: '/',
+  {
+    path: "/",
     component: Home,
     exact: true,
     // 加载 Home 之前要执行的方法
     loadData: Home.loadData,
-    key: 'home'
-  }, { 
-    path: '/login',
+    key: "home"
+  },
+  {
+    path: "/login",
     component: Login,
     exact: true,
-    key: 'login'
+    key: "login"
   }
 ];
 ```
+
 当加载显示 HOME 组件之前，我们希望调用 Home.loadData 方法，提前获取到必要的异步数据。然后再做服务器端渲染，把页面返回给用户。
 
 与之对应的还要去修改引用了路由的地方(因为原来返回 Route 对象，现在只返回了一个数组)。
-```jsx{12}
+
+```jsx {12}
 // server/src/client/index.js
 // ...
 import routes from "../Routes";
@@ -762,26 +769,52 @@ const App = () => {
 // ...
 ```
 
-server/src/server/utils.js 同理。
+**server/src/server/utils.js 同理。**
 
 然后我们去修改服务器端渲染前的文件，使其能获取到用户当前访问的地址+路由。
-server/src/server/utils.js
-![图片](https://images-cdn.shimo.im/tn1zVohlF4QHbDgf/image.png!thumbnail)
+
+```jsx {16}
+// server/src/server/utils.js
+// ...
+import { StaticRouter, Route, matchPath } from "react-router-dom";
+import routes from "../Routes";
+import getStore from "../store";
+
+export const render = req => {
+  // 服务器端：在这里拿到异步的数据并填充到store，就可以在服务器端渲染时有数据一块渲染
+  const store = getStore();
+
+  // 根据路由的路径，来往store里面加数据
+  const matchRoutes = [];
+  // use 'some' to imitate '<Switch>' behavior of selecting only
+  routes.some(route => {
+    // matchPath: 当前路径req.path和route对象是否匹配，匹配返回true
+    const match = matchPath(req.path, route);
+    if (match) {
+      matchRoutes.push(route);
+    }
+  });
+// ...
+```
+
 react router 提供了 matchPath 方法，可以将当前路径和 route 对象进行匹配，匹配上则返回 true。
 
 The **some()** method tests whether at least one element in the array passes the test implemented by the provided function.
 
 假如我们访问的是根路径，打印输出 matchRoutes 数组，可以看到一个匹配上的 route 对象：
-![图片](https://images-cdn.shimo.im/04t6TaGN9u8PEqV7/image.png!thumbnail)
-这样便可以知道用户访问的是哪个路由组件，**并可以执行它的 loadData 方法，加载数据。**
+![console_1](./images/react_ssr/console_1.png)
+
+这样便可以知道用户访问的是哪个路由组件，**从而可以执行它的 loadData 方法，加载数据。**
 
 ### 多级路由问题的处理
 
 matchPath 有个缺陷，不能捕获多级路由。
+
 这时候我们可以借助 react-router-config 这个库的 matchRoutes 方法来代替。
+
 文档：[https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config](https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config)
 
-假设我们新增一个子路由 /subHome，打印输出 matchRoutes 数组中的 routes:
+假设我们在 `/` 下新增一个子路由 `/subHome`：
 
 ```jsx
 {
@@ -800,12 +833,25 @@ matchPath 有个缺陷，不能捕获多级路由。
 },
 ```
 
-server/src/server/utils.js
-![图片](https://images-cdn.shimo.im/Wg1prHnkEb8WIabv/image.png!thumbnail)
-使用 matchRoutes 代替 matchPath，之前的写法可以简化。
+我们使用 matchRoutes 代替 matchPath，之前的写法可以简化。
+
+```jsx {11}
+// server/src/server/utils.js
+// ...
+import { matchRoutes } from 'react-router-config'
+import routes from '../Routes';
+import getStore from '../store';
+
+export const render = (req) => {
+	// 服务器端：在这里拿到异步的数据并填充到store，就可以在服务器端渲染时有数据一块渲染
+	const store = getStore();
+	// 根据路由的路径，来往store里面加数据
+	const matchedRoutes = matchRoutes(routes, req.path);
+// ...
+```
 
 访问/subHome 路径，打印输出 matchdRoutes，可以看到 子 route 对象也显示出来了。
-![图片](https://images-cdn.shimo.im/kPz35qILVv8dGDMQ/image.png!thumbnail)
+![console_2](./images/react_ssr/console_2.png)
 
 下面我们来根据用户访问的路由组件，执行它的 loadData 方法，加载数据。
 
@@ -814,46 +860,219 @@ server/src/server/utils.js
 遍历 matchedRoutes 数组，可以看到里面各个路径对应的路由信息，假如 matchedRoutes 数组的其中的数据项里有 loadData 方法，说明是需要预加载数据的组件。所以执行它的 loadData 方法，把数据异步加载返回，塞到 promises 数组里。等到所有的异步数据都加载好后，再 res.send 返回 render 函数中渲染的所有内容给浏览器。
 
 server/src/server/index.js
-![图片](https://images-cdn.shimo.im/2yWt0aGH34QOn6xJ/image.png!thumbnail)
 
-server/src/server/utils.js
-![图片](https://images-cdn.shimo.im/koO9p1cUjM4rLdN7/image.png!thumbnail)
+```jsx {22,23,24,25}
+import express from "express";
+import { matchRoutes } from "react-router-config";
+import { render } from "./utils";
+import getStore from "../store";
+import routes from "../Routes";
 
-执行组件对应的 loadData 方法，把数据异步加载返回。这里涉及到比较深入的 Promise 执行过程。可以看代码进行理解。
+const app = express();
+app.use(express.static("public"));
 
-server/src/containers/Home/store/actions.js
-![图片](https://images-cdn.shimo.im/kuyFWeoOkPw1e4Us/image.png!thumbnail)
+app.get("*", function(req, res) {
+  // 服务器端：在这里拿到异步的数据并填充到store，就可以在服务器端渲染时有数据一块渲染
+  const store = getStore();
 
-server/src/containers/Home/index.js
-![图片](https://images-cdn.shimo.im/TM9SHxoElKM9QUvF/image.png!thumbnail)
-(多提一句，因为这个是服务端渲染时去调用 store.dispatch(getHomeList)，处理的是服务端的 Store，并不在客户端处理。所以在 react-redux 中的 connect 方法对应的 mapDispatchToProps 是不需要声明就能使用 getHomeList 方法的)
+  // 根据路由的路径，来往store里面加数据
+  const matchedRoutes = matchRoutes(routes, req.path);
+
+  // 用于管理多个promise 请求的执行结果
+  const promises = [];
+
+  matchedRoutes.forEach(item => {
+    // 让matchRoutes里面所有的组件，对应的loadData方法执行一次
+    if (item.route.loadData) {
+      // item.route.loadData() 用于获取异步数据
+      promises.push(item.route.loadData(store));
+    }
+  });
+  // 所有异步数据都获取到后，再服务端渲染页面
+  Promise.all(promises).then(() => {
+    res.send(render(store, routes, req));
+  });
+});
+var server = app.listen(3000);
+```
+
+```jsx
+// server/src/server/utils.js
+import React from "react";
+import { renderToString } from "react-dom/server";
+import { StaticRouter, Route } from "react-router-dom";
+import { Provider } from "react-redux";
+
+export const render = (store, routes, req) => {
+  const content = renderToString(
+    <Provider store={store}>
+      <StaticRouter location={req.path} context={{}}>
+        <div>
+          {routes.map(route => (
+            <Route {...route} />
+          ))}
+        </div>
+      </StaticRouter>
+    </Provider>
+  );
+  return `
+	<html>
+		<head>
+			<title>ssr</title>
+		</head>
+		<body>
+			<div id="root">${content}</div>
+			<script src='/index.js'></script>
+		</body>
+	</html>
+	`;
+};
+```
+
+执行组件对应的 loadData 方法，把数据异步加载返回。这里涉及到比较深入的 Promise 执行过程。可以看代码进行理解。例如下面的
+
+```jsx {4,5,6,7,8,9,10}
+// server/src/containers/Home/store/actions.js
+export const getHomeList = () => {
+  return dispatch => {
+    // return 一个Promise 对象，一级级往上传
+    return axios
+      .get("http://47.95.113.63/ssr/api/news.json?secret=abcd")
+      .then(res => {
+        const list = res.data.data;
+        dispatch(changeList(list));
+      });
+  };
+};
+```
+
+```jsx {18,19,20,21,22,23}
+// server/src/containers/Home/index.js
+// ...
+import { connect } from "react-redux";
+import { getHomeList } from "./store/actions";
+
+class Home extends Component {
+  // ...
+  render() {
+    // ...
+  }
+  componentDidMount() {
+    // 这里只有在客户端渲染才执行
+    // 从mapDispatchToProps里来的getHomeList()
+    this.props.getHomeList();
+  }
+}
+
+Home.loadData = store => {
+  // 这个函数，负责在服务器端渲染之前，把这个路由需要的数据提前加载好
+  // 传一个store值给它是为了使之可以dispatch
+  // store.dispatch这个函数的目的是中间件处理，到getHomeList()方法里具体处理它的派发内容
+  return store.dispatch(getHomeList());
+};
+
+const mapStateToProps = state => ({
+  // ...
+});
+
+const mapDispatchToProps = dispatch => ({
+  getHomeList() {
+    dispatch(getHomeList());
+  }
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Home);
+```
+
+(多提一句，在 Home.loadData 里，因为它是服务端渲染时去调用 store.dispatch(getHomeList)，处理的是服务端的 Store，并不在客户端处理。所以在 react-redux 中的 connect 方法对应的 mapDispatchToProps 是不需要声明就能使用 getHomeList 方法的)
 
 这时候服务端返回的数据里，就有了渲染好的数据。
-![图片](https://images-cdn.shimo.im/Q1SjFDKb6hMOEogB/image.png!thumbnail)
+![source_3](./images/react_ssr/source_3.png)
 
 ### 数据的注水和脱水
 
 为什么要注水和脱水？
-在访问首页 / 的时候，放慢网速我们会发现先白屏，然后才出现了内容。
+
+在访问首页 `/` 的时候，放慢网速我们会发现先白屏，然后才出现了内容。
+
 原因是什么呢？
+
 尽管服务端已经把首页的内容都渲染好了才返回，但是因为在客户端中，Home 组件的生命周期函数 componentDidMount 会执行一次，于是它便会重新执行方法向后台请求数据，然后重新执行了一次客户端渲染，把数据内容填充到页面上。
+
 这造成了网络请求的浪费，损耗性能。
 
 既然我们已经在服务端已经请求过了数据，那在客户端渲染时，就应该直接使用服务端请求好的数据，注入到客户端渲染中的 state。这个就叫做**注水**。
 
-server/src/server/utils.js
-![图片](https://images-cdn.shimo.im/zuVZzxLJpIYZJVNh/image.png!thumbnail)在返回的页面内容 window.context 下，注入服务端获取到的 store 的数据内容。
+```jsx {11,12,13}
+// server/src/server/utils.js
+// ...
+return `
+  <html>
+    <head>
+      <title>ssr</title>
+    </head>
+    <body>
+      <div id="root">${content}</div>
+      <script>
+        window.context = {
+          state: ${JSON.stringify(store.getState())}
+        }
+      </script>
+      <script src='/index.js'></script>
+    </body>
+  </html>
+`;
+```
+
+在返回的页面内容 window.context 下，注入服务端获取到的 store 的数据内容。
 
 服务端返回的页面里可见 window.context 下的内容。
-![图片](https://images-cdn.shimo.im/awn9a6gTUA0jGipO/image.png!thumbnail)
+![source_4](./images/react_ssr/source_4.png)
 
 在客户端拿到服务端给的数据直接使用，而不重新去请求数据，这个使用服务端给的数据的过程就是**脱水**。
 
-server/src/store/index.js
-![图片](https://images-cdn.shimo.im/R09KnDtVbr8pt6Fr/image.png!thumbnail)
+```jsx {16}
+// server/src/store/index.js
+import { createStore, applyMiddleware, combineReducers } from "redux";
+import thunk from "redux-thunk";
+import { reducer as homeReducer } from "../containers/Home/store";
 
-server/src/client/index.js
-![图片](https://images-cdn.shimo.im/FaXeCxKZjqcig06r/image.png!thumbnail)
+const reducer = combineReducers({
+  home: homeReducer
+});
+
+// 服务端渲染时创建 store 的方法
+export const getStore = () => {
+  return createStore(reducer, applyMiddleware(thunk));
+};
+// 客户端渲染时创建 store 的方法
+export const getClientStore = () => {
+  const defaultState = window.context.state;
+  return createStore(reducer, defaultState, applyMiddleware(thunk));
+};
+// ...
+```
+
+然后在客户端渲染这边更变获取 store 的方法：
+
+```jsx {6,10}
+// server/src/client/index.js
+// ...
+import { Provider } from "react-redux";
+import { getClientStore } from "../store";
+
+const store = getClientStore();
+
+const App = () => {
+  return (
+    <Provider store={store}>
+      <BrowserRouter>
+// ...
+```
+
 然后在客户端执行的是 getClientStore 方法，因为在客户端渲染的时候，window.context.state 已经是有内容的了，所以可以直接取到服务端注水时提供的数据。放到 createStore 的第二个参数传入。
 
 这样就可以使得客户端直接使用服务端渲染好的数据。
@@ -861,13 +1080,13 @@ server/src/client/index.js
 ### 优化
 
 但是看网络请求，因为 componentDidMount 的存在，哪怕客户端渲染时直接使用服务端返回的数据，也会发送请求。所以我们要判断，假如服务端已经返回数据了，客户端就不请求数据。
-![图片](https://images-cdn.shimo.im/9LsOuvSruPYqWWyH/image.png!thumbnail)
+![code_1](./images/react_ssr/code_1.png)
 
 最后要重申一次的是，服务端渲染只是第一次访问页面时才有用，之后的页面就完全交给了客户端渲染。所以 componentDidMount 的存在是很有必要的，它在服务端没有返回数据的时候，客户端自己有能力去请求数据。
 
 ## 使用 Node 作为数据获取中间层
 
-![图片](https://images-cdn.shimo.im/mT7y8CcxiucazVBD/image.png!thumbnail)
+![node_1](./images/react_ssr/node_1.png)
 既然引入了中间层，那客户端就不能直接去和后台请求数据，必须通过 Node 层。
 
 ### 使用 proxy 代理，让中间层承担数据获取职责
@@ -875,104 +1094,366 @@ server/src/client/index.js
 之前客户端请求数据的时候直接向后台请求了，是不规范的操作，应该客户端先走 node 中间层，再由中间层做数据请求。
 
 我们可以使用 Proxy 做代理去解决。这里用的是 express，可以借用第三方库 express-http-proxy 来做。
+
 文档：[https://github.com/villadora/express-http-proxy](https://github.com/villadora/express-http-proxy)
 
 例如我们想请求的完整地址是 http://47.95.113.63/ssr/api/news.json?secret=M5s2sPneDE
 
-server/src/server/index.js
-![图片](https://images-cdn.shimo.im/ZiQmL298czISvAP6/image.png!thumbnail)
-代理地址，把本地 localhost 请求代理到http://47.95.113.63/
+代理地址，把本地 localhost 请求代理到 http://47.95.113.63/
 
-server/src/containers/Home/store/actions.js
-![图片](https://images-cdn.shimo.im/6kBSU3eAUvEYJGjY/image.png!thumbnail)
+```jsx
+// server/src/server/index.js
+// ...
+// 代理：当请求地址为 /api 时，执行代理
+app.use(
+  "/api",
+  proxy("http://47.95.113.63", {
+    proxyReqPathResolver: function(req) {
+      // req.url : /news.json?secret=M5s2sPneDE
+      return "/ssr/api" + req.url;
+    }
+  })
+);
+// ...
+```
+
 再更改 axios 的请求地址。
 
-![图片](https://images-cdn.shimo.im/Td4Ip3tI3jACuT5J/image.png!thumbnail)
+```jsx
+// server/src/containers/Home/store/actions.js
+// ...
+export const getHomeList = () => {
+  return dispatch => {
+    return (
+      axios
+        // get("http://47.95.113.63/ssr/api/news.json?secret=abcd")
+        .get("/api/news.json?secret=abcd")
+        .then(res => {
+          const list = res.data.data;
+          dispatch(changeList(list));
+        })
+    );
+  };
+};
+```
+
 代理成功。
+![network_2](./images/react_ssr/network_2.png)
 
-因为同构的因故，getHomeList 这个获取数据的方法客户端和服务端都会各自执行一次，但是这只能在客户端渲染时请求成功，**服务器渲染时，并没有代理到 **[http://47.95.113.63](http://47.95.113.63)** 这后台地址上，直接访问服务器的根目录是请求不到数据的。**
+因为同构的因故，getHomeList 这个获取数据的方法客户端和服务端都会各自执行一次，但是这只能在客户端渲染时请求成功，**服务器渲染时，并没有代理到 **http://47.95.113.63** 这后台地址上，直接访问服务器的根目录是请求不到数据的。\*\*
 
-![图片](https://images-cdn.shimo.im/QAT4DoT83MQSPYjk/image.png!thumbnail)
+![code_2](./images/react_ssr/code_2.png)
 
 所以我们需要区分服务器端请求和客户端请求来做代理，服务器端请求不需要代理，而是直接访问后台获取数据。然后再使用 axios 中的 instance 来合理化判断代码。
+
 文档：[https://github.com/axios/axios#creating-an-instance](https://github.com/axios/axios#creating-an-instance)
 
-server/src/client/request.js
-![图片](https://images-cdn.shimo.im/GQMM35YFAWcRwVfC/image.png!thumbnail)
-server/src/server/request.js
-![图片](https://images-cdn.shimo.im/PudVdrNRXMAwDm13/image.png!thumbnail)
+```jsx {5,6}
+// server/src/client/request.js
+import axios from "axios";
+
+const instance = axios.create({
+  // 客户端请求数据，直接 /
+  baseURL: "/"
+});
+
+export default instance;
+```
+
+```jsx {5,6}
+// server/src/server/request.js
+import axios from "axios";
+
+const instance = axios.create({
+  // 服务端请求数据，直接请求后台地址
+  baseURL: "http://47.95.113.63/ssr"
+});
+
+export default instance;
+```
+
 用 axios 创建一个新的 instance 对象并导出，后续分别调用。
 
-server/src/containers/Home/index.js
-![图片](https://images-cdn.shimo.im/0AAk3QK7X3oJaJOS/image.png!thumbnail)
 调用获取数据方法时，传一个 boolean 值做标记，以区分是服务端还是客户端在调用这个方法。
 
-server/src/containers/Home/store/actions.js
-![图片](https://images-cdn.shimo.im/R7fgsYnYfBAGQ5E4/image.png!thumbnail)
-是服务端调用则使用它对应的 instance 来发请求。
+```jsx {10,11,17,18}
+// server/src/containers/Home/index.js
+// ...
+class Home extends Component {
+  // ...
+  render() {
+    // ...
+  }
+  componentDidMount() {
+    if (!this.props.list.length) {
+      // 客户端请求数据
+      this.props.getHomeList(false);
+    }
+  }
+}
+
+Home.loadData = store => {
+  // 服务端请求数据
+  return store.dispatch(getHomeList(true));
+};
+// ...
+```
+
+```jsx {12,13,16}
+// server/src/containers/Home/store/actions.js
+import { CHANGE_LIST } from "./constants";
+import clientAxios from "../../../client/request";
+import serverAxios from "../../../server/request";
+
+const changeList = list => ({
+  type: CHANGE_LIST,
+  list
+});
+
+export const getHomeList = server => {
+  // 根据传入的值来判断是服务端渲染还是客户端渲染
+  const request = server ? serverAxios : clientAxios;
+  return dispatch => {
+    // 用instance 替换原来的axios对象去发送请求
+    return request.get("/api/news.json?secret=abcd").then(res => {
+      const list = res.data.data;
+      dispatch(changeList(list));
+    });
+  };
+};
+```
+
+是服务端调用则使用它对应的 instance 来发请求，
+
+是客户端调用则使用它对应的 instance 来发请求。
 
 这样就可以解决服务端调用并不需要做代理的问题。
 
 ### redux-thunk 中的 withExtraArgument
 
-上面的请求方式有个问题，就是每次调用方法的时候都需要去声明是不是来自 server 的请求，我们可以从源头去管理区分，这就需要用到 redux-thunk 中的 withExtraArgument 方法。
+上面的请求方式有个问题，就是每次调用方法的时候都需要去声明是不是来自 server 的请求，比较繁琐，我们可以从源头去管理区分，这就需要用到 redux-thunk 中的 withExtraArgument 方法。
+
 文档：[https://github.com/reduxjs/redux-thunk#injecting-a-custom-argument](https://github.com/reduxjs/redux-thunk#injecting-a-custom-argument)
 
-![图片](https://images-cdn.shimo.im/lxIX2KwmQbUnvLMF/image.png!thumbnail)
+![intro_1](./images/react_ssr/intro_1.png)
 
 server/src/store/index.js
-![图片](https://images-cdn.shimo.im/d9QQnFkP5NgBHB0p/image.png!thumbnail)
+![code_3](./images/react_ssr/code_3.png)
 按着官方示例改造 thunk 的引用。
 
-server/src/containers/Home/store/actions.js
-![图片](https://images-cdn.shimo.im/jXdt34nQs6IX9c5R/image.png!thumbnail)
-因为 redux-thunk 的作用，执行 getHomeList 方法的第三个参数就是我们传入的 clientAxios/serverAxios instance。
+```jsx {4,5}
+// server/src/containers/Home/store/actions.js
+// ...
+export const getHomeList = () => {
+  // redux-thunk的第2，3个参数用法出现
+  return (dispatch, getState, axiosInstance) => {
+    return axiosInstance.get("/api/news.json?secret=abcd").then(res => {
+      const list = res.data.data;
+      dispatch(changeList(list));
+    });
+  };
+};
+```
+
+因为 redux-thunk 的作用，执行 getHomeList 方法的第三个参数就是我们传入的 clientAxios/serverAxios 的 instance。
 
 ### renderRoutes 方法实现对多级路由的支持
 
 之前的方式，只能渲染一级路由。
-![图片](https://images-cdn.shimo.im/VGy38anyaH0Cpw1v/image.png!thumbnail)
+
+```jsx {6,7,8,9}
+export const render = (store, routes, req) => {
+  const content = renderToString((
+    <Provider store={store}>
+      <StaticRouter location={req.path} context={{}}>
+        <div>
+          {/*只能渲染一级路由(只有一层 Route)*/}
+          {routes.map(route => (
+            <Route {...route}/>
+          ))}
+        </div>
+      </StaticRouter>
+    </Provider>
+  ));
+```
 
 我们改成多级路由后，需要配合 react-router-config 的 renderRoutes 方法来渲染多级路由。
+
 文档：[https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config#renderroutesroutes-extraprops---switchprops--](https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config#renderroutesroutes-extraprops---switchprops--)
 
+路由文件：
 server/src/Routes.js
-![图片](https://images-cdn.shimo.im/61pbLdJNuAMBNu5p/image.png!thumbnail)
-路由文件。
+![code_4](./images/react_ssr/code_4.png)
 
-server/src/server/index.js
-![图片](https://images-cdn.shimo.im/JA4azAKiAcYh1zit/image.png!thumbnail)
+```jsx {10,11}
+// server/src/server/utils.js
+// ...
+import { StaticRouter } from "react-router-dom";
+import { renderRoutes } from "react-router-config";
 
-server/src/client/index.js
-![图片](https://images-cdn.shimo.im/FDKqjBAvmmcoJIPN/image.png!thumbnail)
+export const render = (store, routes, req) => {
+  const content = renderToString(
+    <Provider store={store}>
+      <StaticRouter location={req.path} context={{}}>
+        {/*这里渲染一级路由那一层的东西*/}
+        {renderRoutes(routes)}
+      </StaticRouter>
+    </Provider>
+  );
+// ...
+```
+
+```jsx {13,14}
+// server/src/client/index.js
+// ...
+import { BrowserRouter } from "react-router-dom";
+import { renderRoutes } from "react-router-config";
+import routes from "../Routes";
+
+const store = getClientStore();
+
+const App = () => {
+  return (
+    <Provider store={store}>
+      <BrowserRouter>
+        {/*这里之渲染一级路由，不需要把二级路由的信息传给renderRoutes*/}
+        {renderRoutes(routes)}
+      </BrowserRouter>
+    </Provider>
+  );
+};
+// ...
+```
+
 服务端和客户端的一级路由只需要 renderRoutes 最外层路由信息就可以。
 
-server/src/App.js
-![图片](https://images-cdn.shimo.im/Ng2QFVdp0Q8smTjw/image.png!thumbnail)
+App 组件是一级路由显示的组件，props 会接受到传过来的路由信息对象，在这里去渲染二级路由。
+
+```jsx {10,11}
+// server/src/App.js
+import React from "react";
+import Header from "./components/Header";
+import { renderRoutes } from "react-router-config";
+
+const App = props => {
+  return (
+    <div>
+      <Header />
+      {/*渲染二级路由*/}
+      {renderRoutes(props.route.routes)}
+    </div>
+  );
+};
+
+export default App;
+```
+
 **一级路由对应的就是 App 组件，所以需要在这个组件里去渲染二级路由。这时候就需要 renderRoutes 第二层路由信息。**
+
 （在其他组件共用的 Header，可以放在这里，只要访问了 / 根路径，Header 组件总会出现。）
 
 打印输出 props.route.routes，其实就是二级路由的对象信息。
-![图片](https://images-cdn.shimo.im/TG1EngFBi5wTQwm3/image.png!thumbnail)
+![console_3](./images/react_ssr/console_3.png)
 
 配合使用 renderRoutes 方法就这样既可实现多级路由渲染。
 
 ### 登陆功能
 
-server/src/components/Header/index.js
-![图片](https://images-cdn.shimo.im/yJ2pM8U8JY88Hdcr/image.png!thumbnail)
-根据 login 值的不同渲染不同的内容。
+根据 login 的值显示不同的内容：
 
-server/src/App.js
-![图片](https://images-cdn.shimo.im/grLWl3ze23kSNZlr/image.png!thumbnail)
+```jsx {9,10,11,12,14}
+// server/src/components/Header/index.js
+// ...
+return (
+  <div>
+    <Link to="/">首页</Link>
+    <br />
+    {/*根据login的值显示不同的内容*/}
+    {login ? (
+      <Fragment>
+        <Link to="/login">翻译列表</Link>
+        <button onClick={handleLogout}>退出</button>
+      </Fragment>
+    ) : (
+      <button onClick={handleLogin}>登陆</button>
+    )}
+  </div>
+);
+// ...
+```
+
 在服务端渲染前，获取 login 的值，以便渲染 Header 的内容。
 
-server/src/components/Header/store/actions.js
-![图片](https://images-cdn.shimo.im/8Ev4mr4JLPoqkNdF/image.png!thumbnail)
+```jsx
+// server/src/App.js
+// ...
+App.loadData = store => {
+  return store.dispatch(actions.getHeaderInfo());
+};
+// ...
+```
 
-server/src/components/Header/store/reducer.js
-![图片](https://images-cdn.shimo.im/7pAogfrCXhcMrIPI/image.png!thumbnail)
+```jsx {13,22,31}
+// server/src/components/Header/store/actions.js
+import { CHANGE_LOGIN } from "./constants";
+
+const changeLogin = value => ({
+  type: CHANGE_LOGIN,
+  value
+});
+
+export const login = () => {
+  return (dispatch, getState, axiosInstance) => {
+    return axiosInstance.get("/api/login.json?secret=abcd").then(res => {
+      // 登录成功
+      dispatch(changeLogin(true));
+    });
+  };
+};
+
+export const logout = () => {
+  return (dispatch, getState, axiosInstance) => {
+    return axiosInstance.get("/api/logout.json?secret=abcd").then(res => {
+      // 退出登录
+      dispatch(changeLogin(false));
+    });
+  };
+};
+
+export const getHeaderInfo = () => {
+  return (dispatch, getState, axiosInstance) => {
+    return axiosInstance.get("/api/isLogin.json?secret=abcd").then(res => {
+      // 获取登录状态(true / false)
+      dispatch(changeLogin(res.data.data.login));
+    });
+  };
+};
+```
+
 再由 reducer 去改变 store 里 login 的值。
+
+```jsx {11,12,13,14}
+// server/src/components/Header/store/reducer.js
+import { CHANGE_LOGIN } from "./constants";
+
+const defaultState = {
+  login: true
+};
+
+export default (state = defaultState, action) => {
+  switch (action.type) {
+    case CHANGE_LOGIN:
+      return {
+        ...state,
+        login: action.value
+      };
+    default:
+      return state;
+  }
+};
+```
+
+![code_5](./images/react_ssr/code_5.png)
 
 ### cookies 携带问题
 
@@ -987,23 +1468,71 @@ server/src/components/Header/store/reducer.js
 7. 但用户重新刷新浏览器的时候
 8. 浏览器发 HTTP 请求 html（请求是携带着 cookies 的）
 9. Node 服务器进行服务器渲染
-10. 进行服务器渲染前，首先要去后台 api 服务器请求数据，但是这时候的请求是不携带 cookies 的，所以造成了重新刷新页面登录状态不对的 bug
+10. 进行服务器渲染前，首先要去后台 api 服务器请求数据，但是这时候的请求是不携带 cookies 的（node 端不是浏览器），所以造成了重新刷新页面登录状态不对的 bug
 
 下面来解决这个问题。
 
 其实只需要在 Node 服务器转发请求的时候，带上客户端之前的 cookies 去请求，问题就解决了。
 发请求的 axios 方法，可以加带一个 headers 对象，往里加 cookie 参数。
 
-server/src/server/request.js
-![图片](https://uploader.shimo.im/f/NeKIwuB2LXga9Com!thumbnail)
-原来这个是个对象，为了接收一个 req 参数，改造成函数形式。
+为了接收一个 req 参数，原来 createInstance 是个对象，将其改造成函数形式。
 
-对于 req 参数，由 express 传递。
-server/src/server/index.js
-![图片](https://uploader.shimo.im/f/5VxEkQ1Ks0ojiOYr!thumbnail)
+```jsx {7,8,9}
+// server/src/server/request.js
+import axios from "axios";
 
-server/src/store/index.js
-![图片](https://uploader.shimo.im/f/I5n0QzDkgHg6BqSk!thumbnail)
+const createInstance = req =>
+  axios.create({
+    baseURL: "http://47.95.113.63/ssr",
+    headers: {
+      cookie: req.get("cookie") || ""
+    }
+  });
+
+export default createInstance;
+```
+
+对于 req 参数，由 express 捕获并传递给 getStore()方法。
+
+```jsx {4}
+// server/src/server/index.js
+// ...
+app.get('*', function (req, res) {
+	const store = getStore(req);
+// ...
+```
+
+在创建服务端的 store 时把 req 传过去，这样请求的 headers 中就带有 cookie 信息了。
+
+```jsx {7,16}
+// server/src/store/index.js
+import { createStore, applyMiddleware, combineReducers } from "redux";
+import thunk from "redux-thunk";
+import { reducer as homeReducer } from "../containers/Home/store";
+import { reducer as headerReducer } from "../components/Header/store";
+import clientAxios from "../client/request";
+import serverAxios from "../server/request";
+const reducer = combineReducers({
+  home: homeReducer,
+  header: headerReducer
+});
+// 创建服务端 store
+export const getStore = req => {
+  return createStore(
+    reducer,
+    applyMiddleware(thunk.withExtraArgument(serverAxios(req)))
+  );
+};
+
+export const getClientStore = () => {
+  const defaultState = window.context.state;
+  return createStore(
+    reducer,
+    defaultState,
+    applyMiddleware(thunk.withExtraArgument(clientAxios))
+  );
+};
+```
 
 ### 曾经的问题：令你深刻的 Bug ?
 
@@ -1046,10 +1575,28 @@ App.loadData = store => {
 
 ### 统一管理密钥
 
-server/src/server/request.js
-![图片](https://images-cdn.shimo.im/sxK9C4syXN4d8D1E/image.png!thumbnail)
 url 上所带的统一的参数，可以放到 axios 的 Instance 里统一调用。
 服务端和客户端都要这样用的时候，可以引入一个公共的 config 文件再去引用。
+
+```jsx
+// server/src/server/request.js
+import axios from "axios";
+// config 里写着各类信息
+import config from "../config";
+
+const createInstance = req =>
+  axios.create({
+    baseURL: "http://47.95.113.63/ssr",
+    headers: {
+      cookie: req.get("cookie") || ""
+    },
+    params: {
+      secret: config.secret
+    }
+  });
+
+export default createInstance;
+```
 
 ### 404 页面
 
@@ -1061,27 +1608,87 @@ url 上所带的统一的参数，可以放到 axios 的 Instance 里统一调�
 }
 ```
 
-![图片](https://uploader.shimo.im/f/RcoQEnuZxf0mgXOS!thumbnail)
+server/src/Routes.js
+![code_6](./images/react_ssr/code_6.png)
 
-server/src/server/utils.js
-![图片](https://images-cdn.shimo.im/M8K0PsU1BVUzmp7S/image.png!thumbnail)
 服务端渲染的 StaticRouter 组件中，contenxt 对象会传给它的所有子组件，子组件可以通过 props.staticContext 获取到这个对象的值。
 
+```jsx {3,7}
+// server/src/server/utils.js
+// ...
+export const render = (store, routes, req, context) => {
+  const content = renderToString(
+    <Provider store={store}>
+      {/*StaticRouter的context对象会传给它的所有子组件*/}
+      <StaticRouter location={req.path} context={context}>
+        <div>{renderRoutes(routes)}</div>
+      </StaticRouter>
+    </Provider>
+  );
+// ...
+```
+
 那我们如何能知道当前页是 404 页面？
+
 可以在 404 页面对应的组件 NotFound 里去改变 staticContext 的值，只有在 404 页面中，才会使 staticContext.NOT_FOUND 的值为 true。
+
 componentWillMount 服务器端也会运行，所以我们将改变 staticContext 的操作放到这里。
 
-server/src/containers/NotFound/index.js
-![图片](https://images-cdn.shimo.im/H1MPPdmatzMrNCQt/image.png!thumbnail)
+```jsx {5,6}
+// server/src/containers/NotFound/index.js
+class NotFound extends Component {
+  // componentWillMount 服务器端也会运行
+  componentWillMount() {
+    const { staticContext } = this.props;
+    staticContext && (staticContext.NOT_FOUND = true);
+  }
+
+  render() {
+    return <div>404, sorry, page not found</div>;
+  }
+}
+```
+
 因为在客户端渲染上，没有 StaticRouter 这个组件，所以也没有 staticContext 这个值，所以我们要在确保有 staticContext 的前提下，才去往 staticContext 里添加一个 NOT_FOUND 对象并设为 true。
 
 最后，要设置 404 页面返回的 status 码为 404。
+
 这个值默认为 200。
-server/src/server/index.js
-![图片](https://uploader.shimo.im/f/AskfqrCQVxwA6xrn!thumbnail)
+
+```jsx {19,20,21,22}
+// server/src/server/index.js
+// ...
+app.get("*", function(req, res) {
+  const store = getStore(req);
+  // 根据路由的路径，来往store里面加数据
+  const matchedRoutes = matchRoutes(routes, req.path);
+  // 让matchRoutes里面所有的组件，对应的loadData方法执行一次
+  const promises = [];
+  matchedRoutes.forEach(item => {
+    if (item.route.loadData) {
+      promises.push(item.route.loadData(store));
+    }
+  });
+  // 所有一部数据都获取到后，再服务端渲染页面
+  Promise.all(promises).then(() => {
+    const context = {};
+    const html = render(store, routes, req, context);
+
+    if (context.NOT_FOUND) {
+      // 设置网络请求的status码为404
+      res.status(404);
+      res.send(html);
+    } else {
+      res.send(html);
+    }
+  });
+});
+```
 
 这里要留意到一点：
+
 为什么要把 render() 赋给一个变量 html？
+
 这是为了做判断，res.send 返回前，render 函数已执行好，即页面已渲染好，再根据条件返回给客户端。
 
 ### 实现服务器端 301 重定向
@@ -1090,45 +1697,146 @@ server/src/server/index.js
 所以我们要做到服务端重定向。
 
 在重定向时，react-router-config 都会帮我做一件事：往 context 里填充这样的内容。
-![图片](https://uploader.shimo.im/f/UI10fOhy5bQjX5aq!thumbnail)
+![console_4](./images/react_ssr/console_4.png)
 
-server/src/server/utils.js
-![图片](https://uploader.shimo.im/f/NQs4Fg4uUvUAykHF!thumbnail)
 文档：[https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config](https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config)
 
-server/src/server/index.js
-![图片](https://uploader.shimo.im/f/NWEZgqls7ucoXzQU!thumbnail)
+```jsx {3,7}
+// server/src/server/utils.js
+// ...
+export const render = (store, routes, req, context) => {
+  const content = renderToString(
+    <Provider store={store}>
+      {/*StaticRouter的context对象会传给它的所有子组件*/}
+      <StaticRouter location={req.path} context={context}>
+        <div>{renderRoutes(routes)}</div>
+      </StaticRouter>
+    </Provider>
+  );
+// ...
+```
+
+```jsx {19,20}
+// server/src/server/index.js
+// ...
+app.get("*", function(req, res) {
+  const store = getStore(req);
+  // 根据路由的路径，来往store里面加数据
+  const matchedRoutes = matchRoutes(routes, req.path);
+  // 让matchRoutes里面所有的组件，对应的loadData方法执行一次
+  const promises = [];
+  matchedRoutes.forEach(item => {
+    if (item.route.loadData) {
+      promises.push(item.route.loadData(store));
+    }
+  });
+  Promise.all(promises).then(() => {
+    const context = {};
+    const html = render(store, routes, req, context);
+    // res.send 返回前，页面已经渲染好。
+    // 重定向时，react-router-config 会给 context.action 注入这个值
+    if (context.action === "REPLACE") {
+      res.redirect(301, context.url);
+    } else if (context.NOT_FOUND) {
+      res.status(404);
+      res.send(html);
+    } else {
+      res.send(html);
+    }
+  });
+});
+```
+
 这样就可以设置 status 码为 301，并跳转到 context.url 里的重定向页面。
 
 ### 容错处理数据请求失败情况下 promise 的处理
 
 目前对服务端渲染的方法是这样的：
-![图片](https://uploader.shimo.im/f/636OwgDrvpwzPlmZ!thumbnail)
+
+```jsx
+// ...
+const promises = [];
+matchedRoutes.forEach(item => {
+  if (item.route.loadData) {
+    promises.push(item.route.loadData(store));
+  }
+});
+Promise.all(promises).then(() => {
+  const context = {};
+  const html = render(store, routes, req, context);
+
+  if (context.action === "REPLACE") {
+    res.redirect(301, context.url);
+  } else if (context.NOT_FOUND) {
+    res.status(404);
+    res.send(html);
+  } else {
+    res.send(html);
+  }
+});
+// ...
+```
+
 这种情况下，只要其中的一个组件 loadData 返回的 Promise 对象是失败的，那全部的组件都不会被渲染，所以需要我们做容错处理，使得就算其中一个组件获取数据失败，其他成功获取数据的组件依旧可以显示。
-我们的原则是，如果某个组件能正常加载，就应该把它显示出来，而不要受到其他组件失败的影响。
+
+**我们的原则是，如果某个组件能正常加载，就应该把它显示出来，而不要受到其他组件失败的影响。**
 
 假设一个页面要加载 A,B,C,D 四个组件，这四个组件都需要服务器端加载数据。
+
 而 A 组件加载数据错误，对于剩下的组件可能有以下两种情况：
 
 1. B, C, D 组件数据已经加载完成了。
+
 2. B, C, D 接口比较慢，B, C, D 组件数据没有加载完成。
 
 第一种情况，给 Promise.all 加上 catch，**Promise.all().then().catch()**，在 catch 中执行和 then 一样的操作。这样 Promise.all() 就算失败，也会执行 catch 里的内容，渲染出 B,C,D 组件的内容。
 
-但是第二种情况，因为接口速度慢，当 B,C,D 还没有返回内容时，因为 A 组件加载失败了，**Promise.all() **则会直接去执行 **catch()** 中的内容，那就算执行了渲染方法，页面也什么都没有，因为 B,C,D 还没有返回数据。
+但是第二种情况，因为接口速度慢，当 B,C,D 还没有返回内容时，因为 A 组件加载失败了，**Promise.all()** 则会直接去执行 **catch()** 中的内容，那就算执行了渲染方法，页面也什么都没有，因为 B,C,D 还没有返回数据。
 
 所以我们去掉 Promise.all 上的 catch 方法，在 loadData 返回的对象的基础上，再封装一个 Promise 对象，无论组件成功还是失败都返回 resolve，这样 promises 数组中的所有 Promise 对象都是 resolve 状态的。
+
 这样确保了每一个有 loadData 方法的对象都有执行 loadData 方法，就算接口或是网速慢也会等待返回结果，得到了结果后才返回的 resolve，也因为所有 loadData 返回的 Promise 对象都是 resolve，所以 Promise.all 走的是 then() 方法。
 
-server/src/server/index.js
-![图片](https://uploader.shimo.im/f/nP8t38EWHzENKG86!thumbnail)
+```jsx {4,5,6,7,8,9,10}
+// server/src/server/index.js
+matchedRoutes.forEach(item => {
+  if (item.route.loadData) {
+    const promise = new Promise((resolve, reject) => {
+      // 成功或失败都返回resolve，所以Promise.all肯定会走then()，把能渲染的全渲染出来
+      item.route
+        .loadData(store)
+        .then(resolve)
+        .catch(resolve);
+    });
+    promises.push(promise);
+  }
+});
+
+// promises = [ a, b, c, d ]
+Promise.all(promises).then(() => {
+  const context = {};
+  const html = render(store, routes, req, context);
+  if (context.action === "REPLACE") {
+    res.redirect(301, context.url);
+  } else if (context.NOT_FOUND) {
+    res.status(404);
+    res.send(html);
+  } else {
+    res.send(html);
+  }
+});
+// ...
+```
 
 ### 一个 loadData 的潜在问题
 
 例如 Home 组件在导出的时候：
 
-```
-export default connect(mapStateToProps,mapDispatchToProps)(Home);
+```jsx
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Home);
 ```
 
 这里导出的其实已经不是 Home 组件了，而是经过了 connect 方法封装后的 Home 组件（高阶组件），而我们却在 Home 下直接绑定了 loadData 方法。
@@ -1139,7 +1847,7 @@ Home.loadData = store => {
 };
 ```
 
-在 react-router-config 调用 loadData 方法的时候，这就可能是有问题的，因为调用的是 原来 Home 下的 loadData 方法，而我们 export 出去的却是一个 connect()(Home) 组件。
+在 react-router-config 调用 loadData 方法的时候，这就可能是有问题的，因为调用的是原来 Home 下的 loadData 方法，而我们 export 出去的却是一个 connect()(Home) 组件。
 
 之所以没有出错是因为 react-redux 将 Home 下的所有方法原封不动的传给了新的 connect()(Home) 组件。但是我们同样可以在这里做一些更改，导出的是一个 ExportHome 高阶组件。
 
@@ -1166,36 +1874,151 @@ ExportHome.loadData = store => {
 
 之前用 webpack 的 isomorphic 只是做到了在服务端打包 CSS，但是并没有把 CSS 放在渲染内容里一块返回给浏览器，从而会导致在客户端重新渲染的时候，出现样式抖动。(因为服务端渲染返回是数据是没有样式内容的，一旦禁用了 JS，样式为空，所以需要把 CSS 样式在服务端渲染时也塞到页面中，一块返回给浏览器)
 
-![图片](https://uploader.shimo.im/f/NAdlCudwv78ROCT8.png!thumbnail)
+![source_5](./images/react_ssr/source_5.png)
 
 做到这个很简单，在服务端渲染的时候，我们有 staticContext 和子组件们做通信，利用 staticContext 把 CSS 的内容给获取到，再渲染到要返回的 HTML 上就可以。
 
-server/src/containers/Home/index.js
-![图片](https://uploader.shimo.im/f/tsjs9n4XVUY45eJ3.png!thumbnail)
-this.props.staticContext 只有服务端渲染时才有，\_getCss 方法是服务端渲染时 isomorphic-style-loader 提供的方法，它可以获取到 CSS 的内容。再把 css 的内容给 staticContext 下新建一个 css 对象。
+this.props.staticContext 只有服务端渲染时才有，`_getCss` 方法是服务端渲染时 isomorphic-style-loader 提供的方法，它可以获取到 CSS 的内容。再把 css 的内容给 staticContext 下新建一个 css 对象。
 
-server/src/server/utils.js
-![图片](https://uploader.shimo.im/f/EPQuTFawcA4LuSfJ.png!thumbnail)
+```jsx {6,7,8}
+// server/src/containers/Home/index.js
+import styles from "./style.css";
+
+class Home extends Component {
+  componentWillMount() {
+    if (this.props.staticContext) {
+      this.props.staticContext.css.push(styles._getCss());
+    }
+  }
+  // ...
+```
+
+```jsx {6,13,22}
+// server/src/server/utils.js
+// ...
+export const render = (store, routes, req, context) => {
+  const content = renderToString(
+    <Provider store={store}>
+      <StaticRouter location={req.path} context={context}>
+        <div>{renderRoutes(routes)}</div>
+      </StaticRouter>
+    </Provider>
+  );
+
+  // css 的内容填充到变量cssStr
+  const cssStr = context.css ? context.css : "";
+
+  return `
+    <html>
+    <head>
+      <title>ssr</title>
+      <style>${cssStr}</style>
+    </head>
+    <body>
+      <div id="root">${content}</div>
+      <script>
+        window.context = {
+          state: ${JSON.stringify(store.getState())}
+        }
+      </script>
+      <script src='/index.js'></script>
+    </body>
+    </html>
+    `;
+};
+```
+
+```jsx {4,5,12}
+// server/src/server/index.js
+// ...
+Promise.all(promises).then(() => {
+  const context = {};
+  const html = render(store, routes, req, context);
+  if (context.action === "REPLACE") {
+    res.redirect(301, context.url);
+  } else if (context.NOT_FOUND) {
+    res.status(404);
+    res.send(html);
+  } else {
+    res.send(html);
+  }
+});
+// ...
+```
 
 这样服务端渲染出的内容就带有 CSS 样式了，解决了客户端重新渲染时会产生的页面抖动问题。
-![图片](https://uploader.shimo.im/f/dbfA4WeOdLEfj6Gv.png!thumbnail)
+![source_6](./images/react_ssr/source_6.png)
 
 ### 多组件中的样式如何整合
 
 上面服务端渲染是往 staticContext.css 对象里塞样式数据，当多个组件同时写样式时，就会前面的会覆盖后面的样式内容。解决这个则把 staticContext.css 改写成一个数组即可。
 
-server/src/server/index.js
-![图片](https://uploader.shimo.im/f/y11IN2ELydkvoYOb.png!thumbnail)
+```jsx {4}
+// server/src/server/index.js
+// ...
+Promise.all(promises).then(() => {
+  const context = { css: [] };
+  const html = render(store, routes, req, context);
 
-server/src/components/Header/index.js，例如 Header 组件新增 css 内容
-![图片](https://uploader.shimo.im/f/KPEqUg9DLQsZxIoo.png!thumbnail)
+  if (context.action === "REPLACE") {
+    res.redirect(301, context.url);
+  } else if (context.NOT_FOUND) {
+    res.status(404);
+    res.send(html);
+  } else {
+    res.send(html);
+  }
+});
+// ...
+```
 
-server/src/App.js，Header 组件上没有 staticContext，所以从它的父组件 App 传过去。![图片](https://uploader.shimo.im/f/mshG2HpKzaIu6y0Y.png!thumbnail)
+server/src/components/Header/index.js，例如 Header 组件新增 css 内容：
+
+```jsx
+// ...
+import styles from "./style.css";
+
+class Header extends Component {
+  componentWillMount() {
+    if (this.props.staticContext) {
+      this.props.staticContext.css.push(styles._getCss());
+    }
+  }
+// ...
+```
+
+server/src/App.js，Header 组件上没有 staticContext，所以从它的父组件 App 传过去。
+
+```jsx {5}
+// ...
+const App = props => {
+  return (
+    <div>
+      <Header staticContext={props.staticContext} />
+      {renderRoutes(props.route.routes)}
+    </div>
+  );
+};
+// ...
+```
 
 server/src/server/utils.js，处理 context.css 数组用于正常显示。
-![图片](https://uploader.shimo.im/f/YdaJ6I1FIE0UEJU2.png!thumbnail)
+
+```jsx {2}
+// ...
+const cssStr = context.css.length ? context.css.join("\n") : "";
+return `
+  <html>
+  <head>
+    <title>ssr</title>
+    <style>${cssStr}</style>
+  </head>
+  // ...
+  `;
+```
+
 可以输出 context.css 和 cssStr 做对比
-![图片](https://uploader.shimo.im/f/YOL6YnU8MDwsusBD.png!thumbnail)
+![console_5](./images/react_ssr/console_5.png)
 
 ### 高阶组件封装来精简代码
 
@@ -1241,21 +2064,21 @@ const ExportHome = connect(
 
 ## SEO
 
-[react-helmet](https://github.com/nfl/react-helmet) 来处理页面 TDK
-[https://github.com/nfl/react-helmet](https://github.com/nfl/react-helmet)
+[react-helmet](https://github.com/nfl/react-helmet) 来处理页面 TDK。
 
 ## 使用预渲染解决 SEO 问题的新思路
 
 针对纯客户端渲染的页面，可以使用预渲染技术来优化 SEO。
 
-![图片](https://uploader.shimo.im/f/up5eWJErc8IRruV2.png!thumbnail)
+![seo_1](./images/react_ssr/seo_1.png)
 
 prerender
 [https://github.com/prerender/prerender](https://github.com/prerender/prerender)
 
 用 Nginx 处理，是爬虫访问页面，就把客户端渲染后完整的页面返回给爬虫。
+
 是正常用户则正常返回页面。
 
-![图片](https://uploader.shimo.im/f/235su94ptZYfbQpR.png!thumbnail)
+![seo_2](./images/react_ssr/seo_2.png)
 
 [https://prerender.io/](https://prerender.io/)

@@ -47,7 +47,7 @@ export const Logo = styled.a.attrs({
 
 因为它的本质是一个 StyledComponent 对象组件，从组件外部接收变量，就和正常的 React 一样传递，在 style.js 里用 props 接收：
 
-```jsx{9}
+```jsx {9}
 import { RecommendWrapper, RecommendItem } from '../style';
 
 class Recommend extends Component {
@@ -67,7 +67,7 @@ class Recommend extends Component {
 // ...
 ```
 
-```jsx{6}
+```jsx {6}
 import styled from "styled-components";
 
 export const RecommendItem = styled.div`
@@ -84,7 +84,7 @@ export const RecommendItem = styled.div`
 
 用 ref 去获取只能获取到 StyledComponent 对象而不是 DOM。
 
-```jsx{6,13}
+```jsx {6,13}
 import { LoginBox } from "./style";
 // ...
 <LoginBox>
@@ -112,7 +112,7 @@ import { LoginBox } from "./style";
 
 这时候可以使用 styled-components 提供的 innerRef ，就可以获取到真实 DOM。
 
-```jsx{6,13}
+```jsx {6,13}
 import { LoginBox } from "./style";
 // ...
 <LoginBox>
@@ -151,7 +151,7 @@ import { LoginBox } from "./style";
 
 引入了和 Header 组件 以及 Home 组件 相关的 reducer 操作。
 
-```jsx{6}
+```jsx {6}
 // /src/store/reducer.js
 import { combineReducers } from "redux";
 import { reducer as headerReducer } from "../common/header/store";
@@ -201,7 +201,7 @@ export default (state = defaultState, action) => {
 
 在 Header 组件里引用 Store 里的 state 值，便要改成 state.header 。
 
-```jsx{6}
+```jsx {6}
 // /src/common/header/index.js
 // ...
 const mapStateToProps = state => {
@@ -231,7 +231,7 @@ API：
 
 **toJS()** 将 Immutable 对象转化成一个 JS 对象。
 
-```jsx{3,6,15,17}
+```jsx {3,6,15,17}
 // /src/common/header/store/reducer.js
 import * as constants from "./constants";
 import { fromJS } from "immutable";
@@ -263,7 +263,7 @@ export default (state = defaultState, action) => {
 
 因为 state.header 已经转变成 Immutable 对象，所以不能用`点(.)`取值，使用 `get()` 方法。
 
-```jsx{5}
+```jsx {5}
 // /src/common/header/index.js
 const mapStateToProps = state => {
   return {
@@ -282,13 +282,13 @@ const mapStateToProps = state => {
 
 安装好 redux-immutable 后，将/src/store/reducer.js 原来的：
 
-```jsx{1}
+```jsx {1}
 import { combineReducers } from "redux";
 ```
 
 改成：
 
-```jsx{2}
+```jsx {2}
 // /src/store/reducer.js
 import { combineReducers } from "redux-immutable";
 import { reducer as headerReducer } from "../common/header/store";
@@ -308,7 +308,7 @@ export default reducer;
 
 Immutable 对象执行多个 get() 时，可以用 **getIn()** 来简化代码，性能也更好。
 
-```jsx{4,5}
+```jsx {4,5}
 const mapStateToProps = state => {
   return {
     // 以下两种写法是等价的
@@ -321,7 +321,7 @@ const mapStateToProps = state => {
 Immutable 对象执行多个 set() 时，可以用 **merge()** 来简化代码，性能也更好。
 下面两句是等价的：
 
-```jsx{7,8,9,10,11}
+```jsx {7,8,9,10,11}
 // src/common/header/store/reducer.js
 // ...
 export default (state = defaultState, action) => {
@@ -342,7 +342,7 @@ export default (state = defaultState, action) => {
 
 ### immutable 对象的循环展示
 
-```jsx{16,18,19}
+```jsx {16,18,19}
 import React, { Component } from "react";
 import { ListItem, ListInfo, LoadMore } from "../style";
 import { connect } from "react-redux";
@@ -396,7 +396,7 @@ export default connect(
 
 axios 接收到的数据里的数组不是 immutable 对象，但是 state 里的数组对象都已经变成了 immutable 对象，若是需要把数据给 state 里的数组对象，要把数组对象转化为 immutable 对象。
 
-```jsx{5,6,7,8,9,10,18}
+```jsx {5,6,7,8,9,10,18}
 // /src/pages/home/store/actionCreators.js
 import axios from "axios";
 import * as constants from "./constants";
@@ -423,7 +423,7 @@ export const getHomeInfo = () => {
 在 merge 的时候，使用 fromJS 将它们转化为 immutable 对象。
 
 
-```jsx{15,16,17,25}
+```jsx {15,16,17,25}
 // /src/pages/home/store/reducer.js
 import { fromJS } from "immutable";
 import * as constants from "./constants";

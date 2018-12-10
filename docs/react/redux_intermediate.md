@@ -128,7 +128,7 @@ componentDidMount() {
 }
 ```
 
-```jsx{10,14}
+```jsx {10,14}
 //  /store/actionCreators.js
 import { INIT_LIST_ACTION } from "./actionTypes";
 import axios from "axios";
