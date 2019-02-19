@@ -5,10 +5,14 @@ JS 里有两种任务类型：
 
 macroTask（宏任务）: `setTimeout`, `setInterval`, `setImmediate`, `requestAnimationFrame`, `user Input/Output`, `UI rendering`
 
-microTask（微任务）: `process.nextTick`, `Promise`, `Object.observe`, `MutaionObserver`
+microTask（微任务）: `process.nextTick（Node）`, `Promise`, `Object.observe(废弃)`, `MutaionObserver`
 
-Event Loop的示意图：
+Javascript 有一个 `main thread 主线程`和 `call-stack 调用栈(执行栈)`，所有的任务都会被放到调用栈等待主线程执行。
+
+### Event Loop示意图
 ![event_loop_1](./images/event_loop/event_loop_1.jpg)
+
+![event_loop_2](./images/event_loop/event_loop_2.jpg)
 
 总的来说，执行顺序是
 
@@ -53,7 +57,11 @@ setTimeout(function() {
     });
 }, 0);
 
-Promise.resolve().then(function() {
+new Promise(resolve => {
+  console.log('resolve');
+  resolve();
+}).
+then(function() {
   console.log('promise1');
 }).then(function() {
   console.log('promise2');
@@ -63,6 +71,7 @@ console.log('script end');
 
 /* 执行顺序
 script start
+resolve
 script end
 promise1
 promise2
@@ -72,12 +81,118 @@ promise22
 */
 ```
 
-看这篇文章中举出的两个例子，就能清楚 macroTask 和 microTask 执行的顺序：
-[Tasks, microtasks, queues and schedules - JakeArchibald.com](https://jakearchibald.com/2015/tasks-microtasks-queues-and-schedules/)
+再看一个例子：
+```js
+new Promise(resolve => {
+  console.log('Promise1');
+  resolve();
+})
+.then(function() {
+	console.log('promise11');
+})
+.then(function() {
+	console.log('promise111');
+})
+
+console.log('script start');
+
+new Promise(resolve => {
+  console.log('Promise2');
+  resolve();
+})
+.then(function() {
+	console.log('promise22');
+})
+.then(function() {
+	console.log('promise222');
+})
+
+console.log('script end');
+
+/* 执行顺序
+Promise1
+script start
+Promise2
+script end
+promise11
+promise22
+promise111
+promise222
+*/
+```
+
+最后看这一个例子：
+```js
+console.log('script start')
+
+async function async1() {
+  await async2();
+  console.log('async1 end');
+}
+
+async function async2() {
+  console.log('async2 end');
+}
+
+async1();
+
+setTimeout(function() {
+  console.log('setTimeout');
+}, 0)
+
+new Promise(resolve => {
+  console.log('Promise');
+  resolve();
+})
+.then(function() {
+  console.log('promise1');
+})
+.then(function() {
+  console.log('promise2');
+})
+
+console.log('script end');
+
+/* 执行顺序
+script start
+async2 end
+Promise
+script end
+promise1
+promise2
+async1 end
+setTimeout
+*/
+```
+**问题是，为什么`async1 end`在`promise2`之后输出？**
+
+`async/await` 在底层转换成了 promise 和 then 回调函数，每次我们使用 `await`, 解释器都创建一个 `Promise对象`，然后把剩下的 async 函数中的操作放到 then 回调函数中。
+例如：
+```js
+async function f() {
+  await p
+  console.log('ok')
+}
+```
+可以简化理解为：
+```js
+function f() {
+  return RESOLVE(p).then(() => {
+    console.log('ok')
+  })
+}
+```
+
+如果 `RESOLVE(p)` 对于 p 为 Promise 直接返回 p 的话，那么 p的 then 方法就会被马上调用，其回调就立即进入 job 队列。
+
+而如果 `RESOLVE(p)` 严格按照标准，应该是产生一个新的 Promise，尽管该 promise 确定会 resolve 为 p，但这个过程本身是异步的，也就是现在进入 job 队列的是新 promise 的 resolve 过程，所以该 promise 的 then 不会被立即调用，而要等到当前 job 队列执行到前述 resolve 过程才会被调用，然后其回调（也就是继续 await 之后的语句）才加入 job 队列，所以时序上就晚了。
 
 ## 参考资料
-[Concurrency model and Event Loop - JavaScript | MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop)
-
+- 看这篇文章中举出的两个例子，就能清楚 macroTask 和 microTask 执行的顺序：
 [Tasks, microtasks, queues and schedules - JakeArchibald.com](https://jakearchibald.com/2015/tasks-microtasks-queues-and-schedules/)
 
-[Event Loop的规范和实现](https://zhuanlan.zhihu.com/p/33087629)
+- [Concurrency model and Event Loop - JavaScript | MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop)
+
+- [Tasks, microtasks, queues and schedules - JakeArchibald.com](https://jakearchibald.com/2015/tasks-microtasks-queues-and-schedules/)
+
+- [Event Loop的规范和实现](https://zhuanlan.zhihu.com/p/33087629)

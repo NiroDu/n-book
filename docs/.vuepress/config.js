@@ -38,9 +38,17 @@ module.exports = {
                 ]
             },
             {
+                title: 'Interview 专栏',
+                collapsable: false,
+                children: [
+                    "/interview/2018.md",
+                ]
+            },
+            {
                 title: 'JavaScript 专栏',
                 collapsable: false,
                 children: [
+                    '/javascript/this_in_js',
                     '/javascript/about_js_this',
                     '/javascript/closure',
                     '/javascript/prototypes_and_prototype_chains',
@@ -79,6 +87,7 @@ module.exports = {
                     "/typescript/advanced_usage.md",
                 ]
             },
+
         ]
     }
 }
