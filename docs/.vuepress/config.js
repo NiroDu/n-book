@@ -42,6 +42,7 @@ module.exports = {
                 collapsable: false,
                 children: [
                     "/interview/2018.md",
+                    "/interview/js_question.md",
                 ]
             },
             {
