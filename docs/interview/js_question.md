@@ -114,7 +114,7 @@ setTimeout(() => {
 }, 0);
 ```
 
-## 数组去重方法十一法
+## 4. 数组去重方法十一法
 **方法一、利用ES6 Set去重**
 ```js
 function unique (arr) {
@@ -168,3 +168,17 @@ unique(arr)
 ```
 [参考](http://blog.poetries.top/FE-Interview-Questions/base/#_74-%E6%95%B0%E7%BB%84%E5%8E%BB%E9%87%8D%E6%96%B9%E6%B3%95%E6%80%BB%E7%BB%93)
 
+
+## 5. 写一段JS程序提取URL中的各个GET参数
+有这样一个URL：http://item.taobao.com/item.htm?a=1&b=2&c=&d=xxx&e，请写一段JS程序提取URL中的各个GET参数(参数名和参数个数不确定)，将其按key-value形式返回到一个json结构中，如{a:’1′, b:’2′, c:”, d:’xxx’, e:undefined}
+```js
+function serilizeUrl(url) {
+  var result = {};
+  url = url.split("?")[1];
+  var map = url.split("&");
+  for(var i = 0, len = map.length; i < len; i++) {
+    result[map[i].split("=")[0]] = map[i].split("=")[1];
+  }
+  return result;
+}
+```

@@ -57,7 +57,7 @@ function changeStyle( type , value ){
 
 var one = document.getElementById( 'one' ); 
 
-changeStyle.call( one , 'fontSize' , '100px' );
+changeStyle.call( one , 'fontSize' , '100px' ); // 正确设置了one元素的字体大小
 
 changeStyle('fontSize' , '300px');  //出现错误，因为此时changeStyle中this引用的是window对象，而window并无style属性。
 ```
@@ -73,7 +73,7 @@ function changeStyle( type , value ){
 
 var one = document.getElementById( 'one' ); 
 
-changeStyle.apply( one , ['fontSize' , '100px' ]);
+changeStyle.apply( one , ['fontSize' , '100px' ]); // 正确设置了one元素的字体大小
 
 changeStyle('fontSize' , '300px');  //出现错误，原因同示例三
 ```

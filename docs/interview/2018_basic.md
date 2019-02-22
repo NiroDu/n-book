@@ -1,4 +1,4 @@
-# 面试
+# 面试-basic
 
 ## Level 1
 
@@ -479,15 +479,15 @@ getElementById()        //通过元素Id，唯一性
 ### 怎么判断两个对象相等？
 可以转换为字符串来判断
 ```js
-obj={
+obj = {
     a:1,
     b:2
 }
-obj2={
+obj2 = {
     a:1,
     b:2
 }
-obj3={
+obj3 = {
     a:1,
     b:'2'
 }
@@ -495,9 +495,13 @@ JSON.stringify(obj)===JSON.stringify(obj2);//true
 JSON.stringify(obj)===JSON.stringify(obj3);//false
 ```
 
-### 深拷贝和浅拷贝
-
-
-### 函数防抖和函数节流
-**防抖**
-> 在滚动事件中需要做个复杂计算或者实现一个按钮的防二次点击操作。可以通过函数防抖动来实现
+### bind的用法，以及如何实现bind的函数和需要注意的点
+bind的作用与call和apply相同，区别是call和apply是立即调用函数，而bind是返回了一个函数，需要调用的时候再执行。 一个简单的bind函数实现如下:
+```js
+Function.prototype.bind = function(ctx) {
+	var fn = this;
+	return function() {
+		fn.apply(ctx, arguments);
+	};
+};
+```

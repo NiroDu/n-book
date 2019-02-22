@@ -41,7 +41,7 @@ module.exports = {
                 title: 'Interview 专栏',
                 collapsable: false,
                 children: [
-                    "/interview/2018.md",
+                    "/interview/2018_basic.md",
                     "/interview/js_question.md",
                 ]
             },
