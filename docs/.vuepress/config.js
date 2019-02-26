@@ -88,7 +88,13 @@ module.exports = {
                     "/typescript/advanced_usage.md",
                 ]
             },
-
+            {
+                title: '其他',
+                collapsable: false,
+                children: [
+                    "/other/yarn_npm_resource_change.md",
+                ]
+            }
         ]
     }
 }
