@@ -188,6 +188,8 @@ function f() {
 而如果 `RESOLVE(p)` 严格按照标准，应该是产生一个新的 Promise，尽管该 promise 确定会 resolve 为 p，但这个过程本身是异步的，也就是现在进入 job 队列的是新 promise 的 resolve 过程，所以该 promise 的 then 不会被立即调用，而要等到当前 job 队列执行到前述 resolve 过程才会被调用，然后其回调（也就是继续 await 之后的语句）才加入 job 队列，所以时序上就晚了。
 
 ## 参考资料
+- [从一道题浅说 JavaScript 的事件循环](https://github.com/Advanced-Frontend/Daily-Interview-Question/issues/7)
+
 - 看这篇文章中举出的两个例子，就能清楚 macroTask 和 microTask 执行的顺序：
 [Tasks, microtasks, queues and schedules - JakeArchibald.com](https://jakearchibald.com/2015/tasks-microtasks-queues-and-schedules/)
 
