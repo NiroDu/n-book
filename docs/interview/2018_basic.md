@@ -505,3 +505,6 @@ Function.prototype.bind = function(ctx) {
 	};
 };
 ```
+
+### BFC
+[深入理解BFC](http://www.cnblogs.com/xiaohuochai/p/5248536.html)
