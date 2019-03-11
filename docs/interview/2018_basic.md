@@ -506,6 +506,9 @@ Function.prototype.bind = function(ctx) {
 };
 ```
 
+### GET和POST的区别
+好 - [GET和POST的区别](https://segmentfault.com/a/1190000018129846)
+
 ### BFC
 [深入理解BFC](http://www.cnblogs.com/xiaohuochai/p/5248536.html)
 
