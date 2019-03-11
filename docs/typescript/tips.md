@@ -10,3 +10,10 @@ declare module 'xxx' {
   export default content;
 }
 ```
+
+## vue cli3 中关闭tslint约束
+`tslint.json`中添加：
+
+`"defaultSeverity": "none"`
+
+告别烦恼。
