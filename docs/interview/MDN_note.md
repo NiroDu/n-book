@@ -51,6 +51,15 @@ const实际上保证的，并不是变量的值不得改动，而是变量指向
 
 [解答](https://blog.fundebug.com/2018/07/25/es6-const/)
 
+## Object.defineProperty()
+[MDN](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty)
+
+## e.target与e.currentTarget的区别
+e.target 指向触发事件监听的对象。
+
+e.currentTarget 指向添加监听事件的对象（addEventListener监听的那个对象）。
+
+[解析](https://www.jianshu.com/p/1dd668ccc97a)
 
 网址
 https://segmentfault.com/a/1190000013396601

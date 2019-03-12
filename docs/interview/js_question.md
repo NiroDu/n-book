@@ -298,3 +298,18 @@ var groupedPeople = groupBy(people, 'age');
 // }
 ```
 
+## 10. 使用 Promise 完成图片的加载。
+```js
+var preloadImage = function (path) {
+  return new Promise(function (resolve, reject) {
+    var image = new Image();
+    image.onload  = resolve;
+    image.onerror = reject;
+    image.src = path;
+  });
+};
+
+preloadImage('https://xxx/xx.jpg')
+  .then(function (e) { document.body.append(e.target) })
+  .then(function () { console.log('加载成功') })
+```
