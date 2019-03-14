@@ -4,6 +4,18 @@
 ![redux_work_flow_2](./images/redux_basic/redux_work_flow_2.png)
 Redux 是 Flux 框架的改良，新引入了 Reducer 这个概念。
 
+## Redux 三大原则
+[three-principles](https://redux.js.org/introduction/three-principles)
+
+1. Single source of truth
+The state of your whole application is stored in an object tree within a single store.
+
+2. State is read-only
+The only way to change the state is to emit an action, an object describing what happened.
+
+3. Changes are made with pure functions
+To specify how the state tree is transformed by actions, you write pure reducers.
+
 ## Redux 工作流程
 
 ![redux_work_flow_3](./images/redux_basic/redux_work_flow_3.png)

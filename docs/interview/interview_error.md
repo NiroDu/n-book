@@ -8,6 +8,10 @@ console.log(typeof null); // object
 
 [解析](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/typeof)
 
+[instanceof](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/instanceof)
+
+[Object.prototype.toString.call()](https://www.jianshu.com/p/585926ae62cc)
+
 ## 第 2 题
 
 ```js
