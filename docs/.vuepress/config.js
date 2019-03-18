@@ -37,16 +37,16 @@ module.exports = {
                     '/'
                 ]
             },
-            // {
-            //     title: 'Interview 专栏',
-            //     collapsable: false,
-            //     children: [
-            //         "/interview/2018_basic.md",
-            //         "/interview/js_question.md",
-            //         "/interview/interview_error.md",
-            //         "/interview/MDN_note.md",
-            //     ]
-            // },
+            {
+                title: 'Interview 专栏',
+                collapsable: false,
+                children: [
+                    "/interview/2018_basic.md",
+                    "/interview/js_question.md",
+                    "/interview/interview_error.md",
+                    "/interview/MDN_note.md",
+                ]
+            },
             {
                 title: 'JavaScript 专栏',
                 collapsable: false,

@@ -45,9 +45,11 @@ var foo = "Hello";
 console.log("2:", foo + bar);
 ```
 
+```js
 输出答案：
 1: HelloWorld
 Uncaught ReferenceError: bar is not defined
+```
 
 自执行函数把变量 bar 限定在其中了。
 
@@ -65,6 +67,7 @@ Promise.resolve().then(() => {
 (() => console.log(3))();
 ```
 
+```js
 输出答案：
 3
 2
@@ -72,8 +75,10 @@ Promise.resolve().then(() => {
 4
 4
 4
+```
 
 解析：关键处是输出了 4 次 4。
+
 settimeout 是异步执行，0ms 后往任务队列里面添加一个任务，只有主线上的全部执行完，才会执行任务队列里的任务，当主线执行完成后，i 是 4，所以此时再去执行任务队列里的任务时，i 全部是 4 了。对于打印 4 次是：每一次 for 循环的时候，settimeout 都执行一次，但是里面的函数没有被执行，而是被放到了任务队列里面，等待执行，for 循环了 4 次，就放了 4 次，当主线程执行完成后，才进入任务队列里面执行。
 
 想要它按着 0,1,2,3 的顺序输出，有两种办法，一个是使用 let，另外一个方式是自执行函数限定。
@@ -125,12 +130,13 @@ try {
   console.log("Fb-error");
 }
 ```
-
+```js
 输出答案：
 Object
 fb-error
 Object
 Function
+```
 
 解析：
 f 的原型链：
@@ -197,6 +203,8 @@ obj1.sayName.call(obj2);
 obj3.sayName.call(obj2);
 obj4.sayName.call(obj2);
 ```
+
+```js
 输出答案：
 obj1
 name
@@ -205,9 +213,11 @@ name
 obj2
 name
 name
+```
 
 解析：
 obj3.sayName.call(obj2); 箭头函数没有自身的this，会直接忽略掉call的第一个参数，所以没法改掉this的指向。
+
 obj4.sayName.call(obj2); 自执行函数也没法通过call来改变（不确定正误）
 
 ## 第 7 题
@@ -224,8 +234,21 @@ promise.then(()=>{
 
 console.log(4);
 ```
+```js
 输出答案：
 1
 2
 4
 3
+```
+
+## 第 8 题 讲讲Vue和React的异同
+讲讲 Vue 和 React 的不同处和相同处。
+
+
+## 第 9 题 讲讲Redux的工作机制
+讲讲 Vue 和 React 的不同处和相同处。
+
+## 第 10 题 讲讲Redux createStore的实现原理
+[createStore原理及作用](https://www.jianshu.com/p/670817164b91)
+[redux源码解读－－createStore源码解析](https://segmentfault.com/a/1190000011835213)
