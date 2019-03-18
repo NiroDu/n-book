@@ -245,10 +245,12 @@ console.log(4);
 ## 第 8 题 讲讲Vue和React的异同
 讲讲 Vue 和 React 的不同处和相同处。
 
-
 ## 第 9 题 讲讲Redux的工作机制
 讲讲 Vue 和 React 的不同处和相同处。
 
 ## 第 10 题 讲讲Redux createStore的实现原理
 [createStore原理及作用](https://www.jianshu.com/p/670817164b91)
 [redux源码解读－－createStore源码解析](https://segmentfault.com/a/1190000011835213)
+
+## 第 11 题
+有一个商品id数组 `[1,3,2,4,6,5,7]`，遍历该数组取得每个商品的id，并且用该id去请求商品详情数据 `{name:'a',...}`，并把每条详情数据都存到一个新的数组 resultArray 中。

@@ -54,6 +54,7 @@ module.exports = {
                     '/javascript/this_in_js',
                     '/javascript/about_js_this',
                     '/javascript/closure',
+                    '/javascript/inheritance',
                     '/javascript/prototypes_and_prototype_chains',
                     '/javascript/inheritance_and_prototype_chain_1',
                     '/javascript/inheritance_and_prototype_chain_2',

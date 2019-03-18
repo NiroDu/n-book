@@ -2,7 +2,9 @@
 
 这篇文章主要解决两个问题：
 1. what’s prototype chains? and how prototype object chains allow objects to inherit features from one another?
+(什么是原型链？以及原型对象链如何允许一个对象从另一个对象中继承其特性？)
 2. what’s the prototype property? and how the prototype property can be used to add methods to existing constructors?
+(原型属性是什么？以及如何使用原型属性向现有构造函数添加方法？)
  
 ## 定义
 > JavaScript is often described as a prototype-based language — **each object has a prototype object**, which acts as a template object that it inherits methods and properties from. An object's prototype object may also have a prototype object, which it inherits methods and properties from, and so on. This is often referred to as a `prototype chain`, and explains why different objects have properties and methods defined on other objects available to them.
