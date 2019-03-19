@@ -65,7 +65,7 @@ async function queue(arr) {
   for (let promise of arr) {
     res = await promise(res)
   }
-  return await res
+  return res
 }
 queue([a, b, c])
 ```

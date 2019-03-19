@@ -254,4 +254,45 @@ console.log(4);
 [redux源码解读－－createStore源码解析](https://segmentfault.com/a/1190000011835213)
 
 ## 第 11 题
-有一个商品id数组 `[1,3,2,4,6,5,7]`，遍历该数组取得每个商品的id，并且用该id去请求商品详情数据 `{name:'a',...}`，并把每条详情数据都存到一个新的数组 resultArray 中。
+有一个商品id数组 `['1','2','3','4','5','6','7','8'];`，遍历该数组取得每个商品的id，并且用该id去请求商品详情数据 `{name:'a',...}`，并把每条详情数据都存到一个新的数组 resultArray 中。
+
+做法一
+```js
+async function getDetailInfo() {
+  const array = ['1','2','3','4','5','6','7','8'];
+  const resultArray = [];
+
+  for(let item of array) {
+    const response = await axios.get('.../detail', {
+      params: {id: item}
+    })
+    resultArray.push(response.data);
+    console.log('resultArray:',resultArray);
+  };
+}
+```
+
+做法二
+```js
+function getDetailInfo() {
+  // 创建一个resolve状态的变量，以便可以直接执行then()
+  const sequence = Promise.resolve();
+  // array.forEach(function(item) {
+  for(let item of array) {
+    function axioss() {
+      return new Promise(function (resolve,reject) {
+        axios.get('.../detail', {
+          params: {id: item}
+        }).then(function(response) {
+          resultArray.push(response.data.data);
+          console.log('resultArray:',resultArray);
+          resolve();
+        })
+      })
+    }
+    // 第一次执行了上方声明的resolve状态后，遍历数组中会返回新的resolve状态，把resolve状态再重新赋给sequence，以便下一次Promise的继续执行
+    sequence = sequence.then(axioss);
+  }
+  // );
+}
+```
