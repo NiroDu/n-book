@@ -250,6 +250,7 @@ console.log(4);
 
 ## 第 10 题 讲讲Redux createStore的实现原理
 [createStore原理及作用](https://www.jianshu.com/p/670817164b91)
+
 [redux源码解读－－createStore源码解析](https://segmentfault.com/a/1190000011835213)
 
 ## 第 11 题

@@ -74,6 +74,7 @@ module.exports = {
                     '/react/redux_intermediate',
                     '/react/libs_with_react',
                     '/react/react_ssr',
+                    '/react/redux_createstore',
                 ]
             },
             {
