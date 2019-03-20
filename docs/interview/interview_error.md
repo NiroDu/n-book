@@ -130,6 +130,7 @@ try {
   console.log("Fb-error");
 }
 ```
+
 ```js
 输出答案：
 Object
@@ -163,7 +164,7 @@ F.__proto__.__proto__ === Object.prototype; // true
 f.constructor === F; // true
 ```
 
-[好文 - 一张图理解prototype、proto和constructor的三角关系](https://www.cnblogs.com/xiaohuochai/p/5721552.html)
+[好文 - 一张图理解 prototype、proto 和 constructor 的三角关系](https://www.cnblogs.com/xiaohuochai/p/5721552.html)
 
 ## 第 6 题
 
@@ -216,24 +217,26 @@ name
 ```
 
 解析：
-obj3.sayName.call(obj2); 箭头函数没有自身的this，会直接忽略掉call的第一个参数，所以没法改掉this的指向。
+obj3.sayName.call(obj2); 箭头函数没有自身的 this，会直接忽略掉 call 的第一个参数，所以没法改掉 this 的指向。
 
-obj4.sayName.call(obj2); 自执行函数也没法通过call来改变（不确定正误）
+obj4.sayName.call(obj2); 自执行函数也没法通过 call 来改变（不确定正误）
 
 ## 第 7 题
-```js
-const promise = new Promise((resolve,reject)=>{
-	console.log(1);
-	resolve();
-	console.log(2);
-})
 
-promise.then(()=>{
-	console.log(3);
-})
+```js
+const promise = new Promise((resolve, reject) => {
+  console.log(1);
+  resolve();
+  console.log(2);
+});
+
+promise.then(() => {
+  console.log(3);
+});
 
 console.log(4);
 ```
+
 ```js
 输出答案：
 1
@@ -242,53 +245,59 @@ console.log(4);
 3
 ```
 
-## 第 8 题 讲讲Vue和React的异同
+## 第 8 题 讲讲 Vue 和 React 的异同
+
 讲讲 Vue 和 React 的不同处和相同处。
 
-## 第 9 题 讲讲Redux的工作机制
-讲讲 Vue 和 React 的不同处和相同处。
+## 第 9 题 讲讲 Redux 的工作机制
 
-## 第 10 题 讲讲Redux createStore的实现原理
-[createStore原理及作用](https://www.jianshu.com/p/670817164b91)
+## 第 10 题 讲讲 Redux createStore 的实现原理
 
-[redux源码解读－－createStore源码解析](https://segmentfault.com/a/1190000011835213)
+[createStore 原理及作用](https://www.jianshu.com/p/670817164b91)
+
+[redux 源码解读－－createStore 源码解析](https://segmentfault.com/a/1190000011835213)
 
 ## 第 11 题
-有一个商品id数组 `['1','2','3','4','5','6','7','8'];`，遍历该数组取得每个商品的id，并且用该id去请求商品详情数据 `{name:'a',...}`，并把每条详情数据都存到一个新的数组 resultArray 中。
+
+有一个商品 id 数组 `['1','2','3','4','5','6','7','8'];`，遍历该数组取得每个商品的 id，并且用该 id 去请求商品详情数据 `{name:'a',...}`，并把每条详情数据都存到一个新的数组 resultArray 中。
 
 做法一
+
 ```js
 async function getDetailInfo() {
-  const array = ['1','2','3','4','5','6','7','8'];
+  const array = ["1", "2", "3", "4", "5", "6", "7", "8"];
   const resultArray = [];
 
-  for(let item of array) {
-    const response = await axios.get('.../detail', {
-      params: {id: item}
-    })
+  for (let item of array) {
+    const response = await axios.get(".../detail", {
+      params: { id: item }
+    });
     resultArray.push(response.data);
-    console.log('resultArray:',resultArray);
-  };
+    console.log("resultArray:", resultArray);
+  }
 }
 ```
 
 做法二
+
 ```js
 function getDetailInfo() {
   // 创建一个resolve状态的变量，以便可以直接执行then()
   const sequence = Promise.resolve();
   // array.forEach(function(item) {
-  for(let item of array) {
+  for (let item of array) {
     function axioss() {
-      return new Promise(function (resolve,reject) {
-        axios.get('.../detail', {
-          params: {id: item}
-        }).then(function(response) {
-          resultArray.push(response.data.data);
-          console.log('resultArray:',resultArray);
-          resolve();
-        })
-      })
+      return new Promise(function(resolve, reject) {
+        axios
+          .get(".../detail", {
+            params: { id: item }
+          })
+          .then(function(response) {
+            resultArray.push(response.data.data);
+            console.log("resultArray:", resultArray);
+            resolve();
+          });
+      });
     }
     // 第一次执行了上方声明的resolve状态后，遍历数组中会返回新的resolve状态，把resolve状态再重新赋给sequence，以便下一次Promise的继续执行
     sequence = sequence.then(axioss);
@@ -296,3 +305,55 @@ function getDetailInfo() {
   // );
 }
 ```
+
+## 第 12 题 讲讲 Vue 的双向绑定
+
+实现简单的双向绑定
+
+```html
+<body>
+  <div id="app">
+    <input type="text" id="txt" />
+    <p id="show"></p>
+  </div>
+</body>
+```
+
+```js
+var obj = {};
+Object.defineProperty(obj, "txt", {
+  get: function() {
+    return obj;
+  },
+  set: function(newValue) {
+    document.getElementById("txt").value = newValue;
+    document.getElementById("show").innerHTML = newValue;
+  }
+});
+document.addEventListener("keyup", function(e) {
+  obj.txt = e.target.value;
+});
+```
+
+
+
+## JS 浮点数运算的精度问题
+
+```js
+console.log(0.1 + 0.2 == 0.3); // false
+```
+
+[解答](https://www.html.cn/archives/7340)
+
+## ES6 的 const 并非一定为常量
+
+```js
+const foo = {};
+foo.name = "a";
+console.log(foo.name); // 打印 "a"
+```
+
+const 实际上保证的，并不是变量的值不得改动，而是变量指向的那个内存地址所保存的数据不得改动。对于简单类型的数据（数值、字符串、布尔值），值就保存在变量指向的那个内存地址，因此等同于常量。
+但**对于复合类型的数据（主要是对象和数组），变量指向的内存地址，保存的只是一个指向实际数据的指针，const 只能保证这个指针是固定的（即总是指向另一个固定的地址），至于它指向的数据结构是不是可变的，就完全不能控制了**。因此，将一个对象声明为常量必须非常小心。
+
+[解答](https://blog.fundebug.com/2018/07/25/es6-const/)

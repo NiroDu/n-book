@@ -34,23 +34,6 @@ display.call();  // sData value is Wisen
 ## bind
 [MDN](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/bind)
 
-## JS浮点数运算的精度问题
-```js
-console.log(0.1+0.2==0.3) // false
-```
-[解答](https://www.html.cn/archives/7340)
-
-## ES6的const并非一定为常量
-```js
-const foo = {};
-foo.name = "a";
-console.log(foo.name); // 打印 "a"
-```
-const实际上保证的，并不是变量的值不得改动，而是变量指向的那个内存地址所保存的数据不得改动。对于简单类型的数据（数值、字符串、布尔值），值就保存在变量指向的那个内存地址，因此等同于常量。
-但**对于复合类型的数据（主要是对象和数组），变量指向的内存地址，保存的只是一个指向实际数据的指针，const只能保证这个指针是固定的（即总是指向另一个固定的地址），至于它指向的数据结构是不是可变的，就完全不能控制了**。因此，将一个对象声明为常量必须非常小心。
-
-[解答](https://blog.fundebug.com/2018/07/25/es6-const/)
-
 ## Object.defineProperty()
 [MDN](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty)
 

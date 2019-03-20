@@ -313,3 +313,35 @@ preloadImage('https://xxx/xx.jpg')
   .then(function (e) { document.body.append(e.target) })
   .then(function () { console.log('加载成功') })
 ```
+
+## duplicate([1,2,3,4,5]);
+输出 [1,2,3,4,5,1,2,3,4,5]
+```js
+function duplicate(arr){
+  // 一定要把初始的数组长度先保存再遍历，不然数组长度会一直增加
+  var length = arr.length;
+  for(var i=0; i<length; i++) {
+    arr.push(arr[i]);
+  }
+  return arr;
+}
+```
+
+## 叠加
+输出
+
+add(2, 5); // 7 
+
+add(2)(5); // 7
+
+```js
+function add(x,y) {
+  if(arguments.length == 1){
+    return function(y) { return x + y; };
+  } else{
+    return x+y;
+  }
+};
+console.log(add(2)(5));
+console.log(add(2,5));
+```
