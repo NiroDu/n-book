@@ -314,7 +314,7 @@ preloadImage('https://xxx/xx.jpg')
   .then(function () { console.log('加载成功') })
 ```
 
-## duplicate([1,2,3,4,5]);
+## 11. duplicate([1,2,3,4,5]);
 输出 [1,2,3,4,5,1,2,3,4,5]
 ```js
 function duplicate(arr){

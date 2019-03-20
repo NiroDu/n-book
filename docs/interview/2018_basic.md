@@ -556,3 +556,10 @@ class Example extends React.Component {
 
 ### Vue 面试题
 [Vue面试中，经常会被问到的面试题/Vue知识点整理](https://segmentfault.com/a/1190000016344599)
+
+### e.target与e.currentTarget的区别
+e.target 指向触发事件监听的对象。
+
+e.currentTarget 指向添加监听事件的对象（addEventListener监听的那个对象）。
+
+[解析](https://www.jianshu.com/p/1dd668ccc97a)

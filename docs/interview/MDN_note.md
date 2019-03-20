@@ -37,12 +37,64 @@ display.call();  // sData value is Wisen
 ## Object.defineProperty()
 [MDN](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty)
 
-## e.target与e.currentTarget的区别
-e.target 指向触发事件监听的对象。
+## transform
+[MDN](https://developer.mozilla.org/zh-CN/docs/Web/CSS/transform)
 
-e.currentTarget 指向添加监听事件的对象（addEventListener监听的那个对象）。
+skew,translate,rotate,scale,matrix,perspective
 
-[解析](https://www.jianshu.com/p/1dd668ccc97a)
+```css
+/* Function values */
+transform: matrix(1.0, 2.0, 3.0, 4.0, 5.0, 6.0);
+transform: translate(12px, 50%);
+transform: translateX(2em);
+transform: translateY(3in);
+transform: scale(2, 0.5);
+transform: scaleX(2);
+transform: scaleY(0.5);
+transform: rotate(0.5turn);
+transform: skew(30deg, 20deg);
+transform: skewX(30deg);
+transform: skewY(1.07rad);
+transform: matrix3d(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0);
+transform: translate3d(12px, 50%, 3em);
+transform: translateZ(2px);
+transform: scale3d(2.5, 1.2, 0.3);
+transform: scaleZ(0.3);
+transform: rotate3d(1, 2.0, 3.0, 10deg);
+transform: rotateX(10deg);
+transform: rotateY(10deg);
+transform: rotateZ(10deg);
+transform: perspective(17px);
+transform: translateX(10px) rotate(10deg) translateY(5px);
+```
+
+## transition
+[MDN](https://developer.mozilla.org/zh-CN/docs/Web/CSS/transition)
+
+transition-property，transition-duration，transition-timing-function 和 transition-delay。
+```css
+/* Apply to 2 properties */
+transition: margin-right 4s, color 1s;
+/* Apply to all changed properties */
+transition: all 0.5s ease-out;
+```
+
+## animation
+[MDN](https://developer.mozilla.org/zh-CN/docs/Web/CSS/animation)
+
+animation-name, animation-duration, animation-timing-function, animation-delay, animation-iteration-count, animation-direction 和 animation-fill-mode.
+
+```css
+/* @keyframes duration | timing-function | delay |
+   iteration-count | direction | fill-mode | play-state | name */
+  animation: 3s ease-in 1s 2 reverse both paused slidein;
+
+/* @keyframes duration | timing-function | delay | name */
+  animation: 3s linear 1s slidein;
+
+/* @keyframes duration | name */
+  animation: 3s slidein;
+```
 
 网址
 https://segmentfault.com/a/1190000013396601

@@ -16,7 +16,7 @@ console.log(foo.__proto__ === Foo.prototype); // ture
 console.log(Foo.prototype.__proto__ === Object.prototype); // true
 ```
 
-![inheritance_and_the_prototype_chain_1](./images/inheritance_and_the_prototype_chain_1/inheritance_and_the_prototype_chain_1.png)
+![inheritance_and_the_prototype_chain_1](./images/inheritance_and_the_prototype_chain_1/inheritance_and_prototype_chain_1.png)
 
 ## Inheritance with the prototype chain
 ### Inheriting properties

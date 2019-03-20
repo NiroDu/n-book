@@ -335,7 +335,36 @@ document.addEventListener("keyup", function(e) {
 });
 ```
 
+假如要遍历去劫持对象：
 
+下例中希望是内部变量，所以才弄了newKey，用户通过访问`data.a`访问，而不是`data._a`，所以分别对key和newKey设置了不同的enumerable。
+```js
+const data = {
+  _a: 1,
+  _b: 2
+};
+Object.keys(data).forEach(key => {
+  console.log("data:", data); // {_a: 1, _b: 2}
+  console.log("key:", key); // _a, _b
+  const newKey = key.slice(1);
+  console.log("newKey:", newKey); // a, b
+  Object.defineProperty(data, newKey, {
+    get() {
+      console.log(`get: ${newKey}`);
+      return data[key];
+    },
+    set(newValue) {
+      console.log(`set: newKey:${newKey}, newValue:${newValue}`);
+      this[key] = newValue;
+    },
+    enumerable: true
+  });
+  // 内部的key，不可枚举
+  Object.defineProperty(data, key, {
+    enumerable: false
+  });
+});
+```
 
 ## JS 浮点数运算的精度问题
 
