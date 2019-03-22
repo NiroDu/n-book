@@ -249,6 +249,38 @@ console.log(4);
 
 讲讲 Vue 和 React 的不同处和相同处。
 
+### 1. Virtual DOM
+Vue宣称可以更快地计算出Virtual DOM的差异，这是由于它在渲染过程中，会跟踪每一个组件的依赖关系，不需要重新渲染整个组件树。
+
+而对于React而言，每当应用的状态被改变时，全部子组件都会重新渲染。当然，这可以通过shouldComponentUpdate这个生命周期方法来进行控制，但Vue将此视为默认的优化。
+
+### 2. 组件化
+在Vue中，如果你遵守一定的规则，你可以使用单文件组件，HTML, JavaScript和CSS都写在一个文件之中。你不再需要在.vue组件文件中引入CSS，虽然这也是可以的。
+
+React也是非常相似的，JavaScript与JSX被写入同一个组件文件中。
+
+### 3. Props
+React和Vue都有'props'的概念，这是properties的简写。props在组件中是一个特殊的属性，允许父组件往子组件传送数据。
+
+### 4. 模板 vs JSX
+React与Vue最大的不同是模板的编写。Vue鼓励你去写近似常规HTML的模板。写起来很接近标准HTML元素，只是多了一些属性。
+
+React推荐你所有的模板通用JavaScript的语法扩展——JSX书写。
+React/JSX乍看之下，觉得非常啰嗦，但使用JavaScript而不是模板来开发，赋予了开发者许多编程能力。
+
+Vue鼓励你去使用HTML模板去进行渲染，Vue的模板语法去除了往视图/组件中添加逻辑的诱惑，保持了关注点分离。
+
+### 5. 状态管理 vs 对象属性
+在React中你需要使用setState()方法去更新状态。
+
+在Vue中，state对象并不是必须的，数据由data属性在Vue对象中进行管理。
+
+而在Vue中，则不需要使用如setState()之类的方法去改变它的状态，在Vue对象中，data参数就是应用中数据的保存者。
+
+对于管理大型应用中的状态这一话题而言，Vue.js的作者尤雨溪曾说过，（Vue的）解决方案适用于小型应用，但对于对于大型应用而言不太适合。
+
+[Vue与React两个框架的区别和优势对比](http://caibaojian.com/vue-vs-react.html)
+
 ## 第 9 题 讲讲 Redux 的工作机制
 
 ## 第 10 题 讲讲 Redux createStore 的实现原理
@@ -386,3 +418,89 @@ const 实际上保证的，并不是变量的值不得改动，而是变量指�
 但**对于复合类型的数据（主要是对象和数组），变量指向的内存地址，保存的只是一个指向实际数据的指针，const 只能保证这个指针是固定的（即总是指向另一个固定的地址），至于它指向的数据结构是不是可变的，就完全不能控制了**。因此，将一个对象声明为常量必须非常小心。
 
 [解答](https://blog.fundebug.com/2018/07/25/es6-const/)
+
+## Vue 组件 data 为什么必须是函数？
+[Vue 组件 data 为什么必须是函数？](https://juejin.im/entry/59225ff8a22b9d005885cb15)
+
+## 用关键字new创建对象都做了什么？
+```js
+function Person () {
+    this.name = name;
+    this.age = age;
+    this.job = job;
+    this.sayName = function () {
+        return this.name;
+    };
+}
+var person = new Person("tom", 21, "WEB");
+```
+使用关键字new创建新实例对象经过了以下几步：
+
+1、创建一个新对象，如：var person = {};
+
+2、新对象的_proto_属性指向构造函数的原型对象。
+
+3、将构造函数的作用域赋值给新对象。（也所以this对象指向新对象）
+
+4、执行构造函数内部的代码，将属性添加给person中的this对象。
+
+5、返回新对象person。
+
+```js
+var person = {};
+person.__proto__ = Person.prototype; //引用构造函数的原型对象
+Person.call(person); //将构造函数的作用域给person,即：this值指向person
+return person;
+```
+
+```js
+function newFunc (name) {
+  var o = {};
+  o.__proto__ = Person.prototype;//绑定Person的原型
+  Person.call(o, name);
+  return o;
+}
+```
+更抽象通用的写法：
+```js
+function newFunc (constructor){
+  var o = {};
+  o.__proto__ = constructor.prototype;
+  constructor.apply(o, Array.prototype.slice.call(arguments, 1));
+  return o;
+}
+var person1 = newFunc(Person, 'MeloGuo', 21);
+```
+
+## 手写实现bind
+bind的作用与call和apply相同，区别是call和apply是立即调用函数，而bind是返回了一个函数，需要调用的时候再执行。 一个简单的bind函数实现如下：
+```js
+Function.prototype.bind = function(ctx) {
+    var fn = this;
+    return function() {
+        fn.apply(ctx, arguments);
+    };
+};
+```
+
+第二种
+
+不传入第一个参数，那么默认为 window。
+改变了 this 指向，让新的对象可以执行该函数。那么思路是否可以变成给新的对象添加一个函数，然后在执行完以后删除？
+```js
+Function.prototype.myBind = function (context) {
+  if (typeof this !== 'function') {
+    throw new TypeError('Error')
+  }
+  var _this = this
+  var args = [...arguments].slice(1)
+  // 返回一个函数
+  return function F() {
+    // 因为返回了一个函数，我们可以 new F()，所以需要判断
+    if (this instanceof F) {
+      return new _this(...args, ...arguments)
+    }
+    return _this.apply(context, args.concat(...arguments))
+  }
+}
+```
