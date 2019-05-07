@@ -28,3 +28,8 @@ npmMirror --- https://skimdb.npmjs.com/registry/
 
 deunpm --- http://registry.enpmjs.org/
 ```
+
+查看 npm 全局安装的路径
+```bash
+npm ls -g --depth=0
+```

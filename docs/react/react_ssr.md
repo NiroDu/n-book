@@ -18,10 +18,10 @@ CSR 的 SEO 效果不如 SSR。（因为爬虫只能读取到 html 中的文本�
 
 ## 在服务器端编写 React 组件
 
-用 React 进行的客户端渲染，页面访问的执行顺序。
+用 React 进行的客户端渲染，页面访问的执行顺序：
 ![flow_1](./images/react_ssr/flow_1.png)
 
-在服务器端写 React ，页面访问的执行顺序。
+在服务器端写 React ，页面访问的执行顺序：
 ![flow_2](./images/react_ssr/flow_2.png)
 
 Node 环境下不遵从 **ESModule** 的写法，而遵从 **common.js** 的写法。
@@ -52,32 +52,40 @@ module.exports = {
 
 ## 编写 webpack 4 的配置文件
 
-webpack cli: [https://github.com/webpack/webpack-cli](https://github.com/webpack/webpack-cli)
+安装 webpack cli: [https://github.com/webpack/webpack-cli](https://github.com/webpack/webpack-cli)
+
+```bash
+npm install --save-dev webpack-cli
+yarn add webpack-cli --dev
+```
 
 ### Babel
 
 ```jsx
-server / webpack.server.js;
+//  /webpack.server.js;
 const path = require("path");
 const nodeExternals = require("webpack-node-externals");
 
 module.exports = {
   // 指定target是node环境，原因是例如const path = require('path');
-  // 在node环境下不会将整个包全部引入，而在客户端环境会将整个包全部引入。
+  // 在node环境下不会将整个path包全部引入，而在客户端环境（需要）会将整个path包全部引入。
   // 所以需要声明。
   target: "node", // webpack4要求要声明mode环境
   mode: "development",
   entry: "./src/index.js",
   output: {
-    filename: "bundle.js", // __dirname 指的是服务器端的根路径
+    filename: "bundle.js",
+    // __dirname 指的是服务器端的根路径
     // 打包后的文件放到根路径下的 build 文件夹
     path: path.resolve(__dirname, "build")
-  }, //
+  },
+  // 运行 nodeExternals
   externals: [nodeExternals()],
   module: {
     rules: [
       {
-        test: /\.js?$/, // 要使用 babel-loader，还需要安装它的核心库 babel-core
+        test: /\.js?$/,
+        // 要使用 babel-loader，还需要安装它的核心库 babel-core
         // npm install babel-loader babel-core --save
         loader: "babel-loader",
         exclude: /node_modules/,
@@ -88,10 +96,11 @@ module.exports = {
           presets: [
             "react",
             "stage-0",
+            // 打包编译时，babel会去兼容所有主流浏览器的最后两个版本
+            // 需要安装 npm install babel-preset-env --save 来设置env变量
             [
               "env",
               {
-                // 打包编译时，babel会去兼容所有主流浏览器的最后两个版本
                 targets: {
                   browsers: ["last 2 versions"]
                 }
@@ -113,7 +122,7 @@ $ webpack --config webpack.server.js
 
 运行可能会报如下警告：
 ![warning_1](./images/react_ssr/warning_1.png)
-在服务器端打包的策略和客户端不同，所以要安装 **webpack-node-externals** ，使得代码中引入的第三方的 node modules 不被打包进 bundled.js 里（如 koa，express 这样的库）。
+在服务器端除了要声明 target: "node"，还需要安装 **webpack-node-externals**，使得代码中引入的第三方的库（如 koa、express）不被打包进 bundled.js 里，还是会在 node modules 中加载。
 
 文档：[https://github.com/liady/webpack-node-externals](https://github.com/liady/webpack-node-externals)
 
@@ -134,7 +143,7 @@ yarn add style-loader css-loader
 分别配置客户端和服务端的 webpack 文件：
 
 ```js
-// server/webpack.client.js
+// /webpack.client.js
 const clientConfig = {
   mode: "development",
   entry: "./src/client/index.js",
@@ -164,7 +173,7 @@ const clientConfig = {
 ```
 
 ```jsx
-// server/webpack.server.js
+// /webpack.server.js
 const serverConfig = {
   target: "node",
   mode: "development",
@@ -250,7 +259,7 @@ yarn global add npm-run-all
 可以用 webpack-merge 去合并 webpack 中重复的配置项。
 
 ```js {31}
-// server/webpack.server.js
+// /webpack.server.js
 const path = require("path");
 const nodeExternals = require("webpack-node-externals");
 const merge = require("webpack-merge");
@@ -287,10 +296,10 @@ ReactDOM.render(<App />, document.getElementById("root"));
 
 在服务器端并不能直接 ReactDOM.render() 去取节点渲染。
 
-但 react-dom 提供了服务器端渲染的方法：**renderToString**
+但 react-dom 提供了服务器端渲染的方法：**renderToString** （将组件渲染成字符串返回）
 
 ```jsx {6,9,18}
-// server/src/index.js
+// src/index.js
 import express from "express";
 import Home from "./containers/Home";
 import React from "react";
@@ -330,7 +339,7 @@ var server = app.listen(3000);
 假如我们想点击 button 时执行绑定在上面的 JS 语句，但服务器渲染时，组件上绑定的 JS 语句返回给客户端时会被删掉。
 
 ```jsx {8}
-// server/src/containers/Home/index.js
+// src/containers/Home/index.js
 import React from "react";
 
 const Home = () => {
@@ -352,7 +361,7 @@ export default Home;
 ```
 
 ```jsx
-// server/src/index.js
+// src/index.js
 import express from "express";
 import React from "react";
 import { renderToString } from "react-dom/server";
@@ -379,19 +388,22 @@ app.get("/", function(req, res) {
 var server = app.listen(3000);
 ```
 
-如上面 button 的 alert 语句，渲染到页面时已被删除。
+如上面 button 的 alert 语句，渲染到页面时已被删除。因为 renderToString 方法只会渲染组件的基础内容，不会渲染事件。
 ![source_1](./images/react_ssr/source_1.png)
 
-为了解决这个问题，提出同构这种做法。
+为了解决这个问题，提出**同构**这种做法。
 
 ### 如何在浏览器上执行一段 JS 代码？
 
 ```jsx
+// src/index.js
 const app = express();
 app.use(express.static("public"));
 ```
 
-使用 use() 使用中间件，`express.static('public')` 意思是假如访问的是一个静态文件，就会到根目录下的 public 文件夹去获取资源。我们在 webpack 配置了客户端的文件会被打包到 public 文件夹下，这样就有了解决的一种方式：
+在 express 中提供了这样的方法，使用 use() 使用中间件，`express.static('public')` 意思是假如访问的是一个静态文件，就会到根目录下的 public 文件夹去获取静态资源。
+
+并且我们在 webpack 配置了客户端的文件会被打包到 public 文件夹下，这样就有了解决的一种方式：
 
 ```jsx {10}
 // ...
@@ -413,16 +425,16 @@ app.get("/", function(req, res) {
 
 同构过程：访问 localhost:3000，可以获得服务器端渲染的内容，然后进行客户端的渲染。
 
-在页面中的 `<script src='/index.js'></script>` 会引入 index.js 文件，并且执行里面的 JS 内容。
+在页面中的 `<script src='/index.js'></script>` 会引入 index.js 文件，并且执行里面的 JS 内容（客户端加载 JS）。
 
 ### 让 React 代码在浏览器上运行
 
-根据上面的同构思路，我们在 src 目录下新建一个 client 目录，专门存放客户端要执行的代码 js 文件，并且用 webpack 打包编译到 public 文件夹下，使在浏览器中访问打包后的 server/src/client/index.js 文件（浏览器里是不直接支持 esmodule 的写法的）。
+> 同构思路：我们在 src 目录下新建一个 client 目录，专门存放客户端渲染要执行的代码（client/index.js），并且用 webpack.client.js 将其打包编译到根目录的 public 文件夹下。（浏览器里是不直接支持 esmodule 的写法的，所以要用 webpack 编译）
 
-客户端代码，在服务端渲染后吐给浏览器后，客户端渲染时加载的内容，重新加载了一次组件 Home。
+> 在服务端渲染完吐页面给浏览器后，浏览器会去执行 `<script src='/index.js'></script>` 访问 /index.js 文件，也就是直接访问 public 文件夹下的 index.js，浏览器就又重新加载了一次组件 Home，因为是客户端渲染的 Home，没有用到 renderToSring，JS 事件也都可以正常绑定上去了。
 
 ```jsx
-// server/src/client/index.js
+// src/client/index.js
 import React from "react";
 import ReactDom from "react-dom";
 
@@ -431,7 +443,11 @@ import Home from "../containers/Home";
 ReactDom.hydrate(<Home />, document.getElementById("root"));
 ```
 
-这时候服务器渲染出的内容里，button 上依然是没有 js 语句的，但是客户端渲染时加载的 index.js 文件，同构，使得 button 上的 click 语句正常执行了。
+这里要注意，同构的使用 ReactDom.hydrate `ReactDom.hydrate(<Home />, document.getElementById("root"));`
+
+而不是`ReactDom.render(<Home />, document.getElementById("root"));`
+
+这时候服务器渲染出的内容里，button 上依然是没有 js 语句的，但因为是客户端渲染时加载的 index.js 文件，使得 button 上的 click 语句正常执行了。
 ![source_2](./images/react_ssr/source_2.png)
 
 我们可以看到浏览器请求的先是服务器端返回的 localhost html，然后再请求加载的 index.js：
@@ -443,8 +459,10 @@ ReactDom.hydrate(<Home />, document.getElementById("root"));
 ![flow_4](./images/react_ssr/flow_4.png)
 
 服务器端路由机制：
-同构，在客户端的路由机制是一样的。但是在服务器端就不一样了。
+在客户端的路由机制是一样的。但是在服务器端就不一样了。
+
 最大的区别是服务器端使用 **StaticRouter** ，而客户端使用 **BrowserRouter**。
+
 文档：[https://reacttraining.com/react-router/web/api/StaticRouter](https://reacttraining.com/react-router/web/api/StaticRouter)
 
 安装 react 路由：
@@ -453,10 +471,9 @@ ReactDom.hydrate(<Home />, document.getElementById("root"));
 yarn add react-router-dom
 ```
 
-路由配置文件：
-
+### 路由配置文件：
 ```jsx
-// server/src/Routes.js
+// src/Routes.js
 import React from "react";
 import { Route } from "react-router-dom";
 import Home from "./containers/Home";
@@ -470,10 +487,9 @@ export default (
 );
 ```
 
-客户端使用 BrowserRouter 进行客户端路由渲染。
-
+### 客户端使用 BrowserRouter 进行客户端路由渲染：
 ```jsx {8}
-// /server/src/client/index.js
+// /src/client/index.js
 import React from "react";
 import ReactDom from "react-dom";
 import { BrowserRouter } from "react-router-dom";
@@ -486,10 +502,10 @@ const App = () => {
 ReactDom.hydrate(<App />, document.getElementById("root"));
 ```
 
-服务器端 express 监听所有路由路径，并且把要渲染的内容封装成一个 render 方法（优化策略）。
-
+### 服务端的路由写法：
+而服务器端由 express 监听所有路由路径，并且把要渲染的内容封装成一个 render 方法（优化策略）：
 ```jsx {8}
-// server/src/server/index.js
+// src/server/index.js
 import express from "express";
 import { render } from "./utils";
 
@@ -514,7 +530,7 @@ import Routes from "../Routes";
 
 export const render = req => {
   const content = renderToString(
-    // 服务器端 StaticRouter 无法监听到客户端的url，所以需要req.path传给它
+    // 服务器端 StaticRouter 无法监听到客户端的url路径，所以需要req.path传给location，以便知道当前的path
     <StaticRouter location={req.path} context={{}}>
       {Routes}
     </StaticRouter>
@@ -538,10 +554,27 @@ render 方法中使用 StaticRouter 进行服务器端路由渲染。
 
 context 传递一个对象来通信。官方解释：A plain JavaScript object. During the render, components can add properties to the object to store information about the render. When a `<Route>` matches, it will pass the context object to the component it renders as the staticContext prop.
 
+### 使用Link标签串起路由
+```jsx
+// src/components/Header.js
+import React from "react";
+import { Link } from "react-router-dom";
+const Header = () => {
+  return (
+    <div>
+      <Link to="/">Home</Link>
+      <br />
+      <Link to="/login">Login</Link>
+    </div>
+  );
+};
+export default Header;
+```
+引入组件点击即可跳转路由。
+
 **服务器端渲染只发生在我们第一次进入页面的时候，之后页面由 React 代码接管，路由跳转都是客户端控制的，不会重新请求页面。**
 
 ## SSR 框架与 Redux 的结合
-
 ### 同构项目中引入 Redux
 
 ```jsx
@@ -718,7 +751,7 @@ export default (
 );
 ```
 
-react-router 提供了服务器端渲染所需方法，这时候需要返回一个数组，里面的一个个对象对应着一个个路由。
+react-router 提供了服务器端渲染所需方法，这时候Routes.js需要返回一个数组，里面的一个个对象对应着一个个路由。
 
 改写后的 server/src/Routes.js
 
