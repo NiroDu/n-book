@@ -522,7 +522,7 @@ var server = app.listen(3000);
 req 是 express 监听到路由变更时的一个大对象，其中 req.path 是当前 url 的 pathname。
 
 ```jsx {10}
-// server/src/server/utils.js
+// src/server/utils.js
 import React from "react";
 import { renderToString } from "react-dom/server";
 import { StaticRouter } from "react-router-dom";
@@ -578,7 +578,7 @@ export default Header;
 ### 同构项目中引入 Redux
 
 ```jsx
-// server/src/store/index.js
+// src/store/index.js
 import { createStore, applyMiddleware } from "redux";
 import thunk from "redux-thunk";
 
@@ -604,7 +604,7 @@ A: 涉及到**单例**的问题，在服务器端直接返回一个 store 对象
 客户端引入
 
 ```jsx {11}
-// server/src/client/index.js
+// src/client/index.js
 import React from "react";
 import ReactDom from "react-dom";
 import { BrowserRouter } from "react-router-dom";
@@ -626,7 +626,7 @@ ReactDom.hydrate(<App />, document.getElementById("root"));
 服务器端引入
 
 ```jsx {11}
-// server/src/server/utils.js
+// src/server/utils.js
 import React from "react";
 import { renderToString } from "react-dom/server";
 import { StaticRouter } from "react-router-dom";
@@ -684,7 +684,7 @@ export const render = req => {
 文档：[https://reacttraining.com/react-router/web/guides/server-rendering](https://reacttraining.com/react-router/web/guides/server-rendering)
 
 ```jsx {6,10}
-// server/src/server/utils.js
+// src/server/utils.js
 // ...
 import getStore from '../store';
 
@@ -729,7 +729,7 @@ store 里填充的是什么，我们需要结合当前用户请求的地址+路�
 我们先来做第一步的内容。
 
 ```jsx
-// server/src/containers/Home/index.js
+// src/containers/Home/index.js
 class Home extends Component {
   // ...
 }
@@ -781,7 +781,7 @@ export default [
 与之对应的还要去修改引用了路由的地方(因为原来返回 Route 对象，现在只返回了一个数组)。
 
 ```jsx {12}
-// server/src/client/index.js
+// src/client/index.js
 // ...
 import routes from "../Routes";
 
@@ -807,7 +807,7 @@ const App = () => {
 然后我们去修改服务器端渲染前的文件，使其能获取到用户当前访问的地址+路由。
 
 ```jsx {16}
-// server/src/server/utils.js
+// src/server/utils.js
 // ...
 import { StaticRouter, Route, matchPath } from "react-router-dom";
 import routes from "../Routes";
@@ -869,7 +869,7 @@ matchPath 有个缺陷，不能捕获多级路由。
 我们使用 matchRoutes 代替 matchPath，之前的写法可以简化。
 
 ```jsx {11}
-// server/src/server/utils.js
+// src/server/utils.js
 // ...
 import { matchRoutes } from 'react-router-config'
 import routes from '../Routes';
@@ -892,9 +892,8 @@ export const render = (req) => {
 
 遍历 matchedRoutes 数组，可以看到里面各个路径对应的路由信息，假如 matchedRoutes 数组的其中的数据项里有 loadData 方法，说明是需要预加载数据的组件。所以执行它的 loadData 方法，把数据异步加载返回，塞到 promises 数组里。等到所有的异步数据都加载好后，再 res.send 返回 render 函数中渲染的所有内容给浏览器。
 
-server/src/server/index.js
-
 ```jsx {22,23,24,25}
+// src/server/index.js
 import express from "express";
 import { matchRoutes } from "react-router-config";
 import { render } from "./utils";
@@ -930,7 +929,7 @@ var server = app.listen(3000);
 ```
 
 ```jsx
-// server/src/server/utils.js
+// src/server/utils.js
 import React from "react";
 import { renderToString } from "react-dom/server";
 import { StaticRouter, Route } from "react-router-dom";
@@ -965,7 +964,7 @@ export const render = (store, routes, req) => {
 执行组件对应的 loadData 方法，把数据异步加载返回。这里涉及到比较深入的 Promise 执行过程。可以看代码进行理解。例如下面的
 
 ```jsx {4,5,6,7,8,9,10}
-// server/src/containers/Home/store/actions.js
+// src/containers/Home/store/actions.js
 export const getHomeList = () => {
   return dispatch => {
     // return 一个Promise 对象，一级级往上传
@@ -980,7 +979,7 @@ export const getHomeList = () => {
 ```
 
 ```jsx {18,19,20,21,22,23}
-// server/src/containers/Home/index.js
+// src/containers/Home/index.js
 // ...
 import { connect } from "react-redux";
 import { getHomeList } from "./store/actions";
@@ -1000,7 +999,7 @@ class Home extends Component {
 Home.loadData = store => {
   // 这个函数，负责在服务器端渲染之前，把这个路由需要的数据提前加载好
   // 传一个store值给它是为了使之可以dispatch
-  // store.dispatch这个函数的目的是中间件处理，到getHomeList()方法里具体处理它的派发内容
+  // store.dispatch这个函数的目的是中间件处理，到actions的getHomeList()方法里具体处理它的派发内容
   return store.dispatch(getHomeList());
 };
 
@@ -1009,6 +1008,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
+  // 这里是给客户端渲染时使用
   getHomeList() {
     dispatch(getHomeList());
   }
@@ -1039,8 +1039,9 @@ export default connect(
 
 既然我们已经在服务端已经请求过了数据，那在客户端渲染时，就应该直接使用服务端请求好的数据，注入到客户端渲染中的 state。这个就叫做**注水**。
 
+例如，在返回的页面内容 window.context 下，注入服务端获取到的 store 的数据内容：
 ```jsx {11,12,13}
-// server/src/server/utils.js
+// src/server/utils.js
 // ...
 return `
   <html>
@@ -1060,15 +1061,13 @@ return `
 `;
 ```
 
-在返回的页面内容 window.context 下，注入服务端获取到的 store 的数据内容。
-
 服务端返回的页面里可见 window.context 下的内容。
 ![source_4](./images/react_ssr/source_4.png)
 
 在客户端拿到服务端给的数据直接使用，而不重新去请求数据，这个使用服务端给的数据的过程就是**脱水**。
 
 ```jsx {16}
-// server/src/store/index.js
+// src/store/index.js
 import { createStore, applyMiddleware, combineReducers } from "redux";
 import thunk from "redux-thunk";
 import { reducer as homeReducer } from "../containers/Home/store";
@@ -1084,6 +1083,7 @@ export const getStore = () => {
 // 客户端渲染时创建 store 的方法
 export const getClientStore = () => {
   const defaultState = window.context.state;
+  // createStore的第二个参数是默认的初始值
   return createStore(reducer, defaultState, applyMiddleware(thunk));
 };
 // ...
@@ -1092,7 +1092,7 @@ export const getClientStore = () => {
 然后在客户端渲染这边更变获取 store 的方法：
 
 ```jsx {6,10}
-// server/src/client/index.js
+// src/client/index.js
 // ...
 import { Provider } from "react-redux";
 import { getClientStore } from "../store";
@@ -1135,7 +1135,7 @@ const App = () => {
 代理地址，把本地 localhost 请求代理到 http://47.95.113.63/
 
 ```jsx
-// server/src/server/index.js
+// src/server/index.js
 // ...
 // 代理：当请求地址为 /api 时，执行代理
 app.use(
@@ -1153,7 +1153,7 @@ app.use(
 再更改 axios 的请求地址。
 
 ```jsx
-// server/src/containers/Home/store/actions.js
+// src/containers/Home/store/actions.js
 // ...
 export const getHomeList = () => {
   return dispatch => {
@@ -1173,7 +1173,7 @@ export const getHomeList = () => {
 代理成功。
 ![network_2](./images/react_ssr/network_2.png)
 
-因为同构的因故，getHomeList 这个获取数据的方法客户端和服务端都会各自执行一次，但是这只能在客户端渲染时请求成功，**服务器渲染时，并没有代理到 **http://47.95.113.63** 这后台地址上，直接访问服务器的根目录是请求不到数据的。\*\*
+因为同构的因故，getHomeList 这个获取数据的方法客户端和服务端都会各自执行一次，但是这只能在客户端渲染时请求成功，**服务器渲染时，并没有代理到 http://47.95.113.63 这后台地址上，直接访问服务器的根目录是请求不到数据的。**
 
 ![code_2](./images/react_ssr/code_2.png)
 
@@ -1182,7 +1182,7 @@ export const getHomeList = () => {
 文档：[https://github.com/axios/axios#creating-an-instance](https://github.com/axios/axios#creating-an-instance)
 
 ```jsx {5,6}
-// server/src/client/request.js
+// src/client/request.js
 import axios from "axios";
 
 const instance = axios.create({
@@ -1194,7 +1194,7 @@ export default instance;
 ```
 
 ```jsx {5,6}
-// server/src/server/request.js
+// src/server/request.js
 import axios from "axios";
 
 const instance = axios.create({
@@ -1210,7 +1210,7 @@ export default instance;
 调用获取数据方法时，传一个 boolean 值做标记，以区分是服务端还是客户端在调用这个方法。
 
 ```jsx {10,11,17,18}
-// server/src/containers/Home/index.js
+// src/containers/Home/index.js
 // ...
 class Home extends Component {
   // ...
@@ -1233,7 +1233,7 @@ Home.loadData = store => {
 ```
 
 ```jsx {12,13,16}
-// server/src/containers/Home/store/actions.js
+// src/containers/Home/store/actions.js
 import { CHANGE_LIST } from "./constants";
 import clientAxios from "../../../client/request";
 import serverAxios from "../../../server/request";
@@ -1266,6 +1266,8 @@ export const getHomeList = server => {
 
 上面的请求方式有个问题，就是每次调用方法的时候都需要去声明是不是来自 server 的请求，比较繁琐，我们可以从源头去管理区分，这就需要用到 redux-thunk 中的 withExtraArgument 方法。
 
+> Redux Thunk supports injecting a custom argument using the `withExtraArgument` function.（注入一个自定义的对象，然后可以在thunk调用的第三个参数处取出。）
+
 文档：[https://github.com/reduxjs/redux-thunk#injecting-a-custom-argument](https://github.com/reduxjs/redux-thunk#injecting-a-custom-argument)
 
 ![intro_1](./images/react_ssr/intro_1.png)
@@ -1275,7 +1277,7 @@ server/src/store/index.js
 按着官方示例改造 thunk 的引用。
 
 ```jsx {4,5}
-// server/src/containers/Home/store/actions.js
+// src/containers/Home/store/actions.js
 // ...
 export const getHomeList = () => {
   // redux-thunk的第2，3个参数用法出现
@@ -1319,7 +1321,7 @@ server/src/Routes.js
 ![code_4](./images/react_ssr/code_4.png)
 
 ```jsx {10,11}
-// server/src/server/utils.js
+// src/server/utils.js
 // ...
 import { StaticRouter } from "react-router-dom";
 import { renderRoutes } from "react-router-config";
@@ -1337,7 +1339,7 @@ export const render = (store, routes, req) => {
 ```
 
 ```jsx {13,14}
-// server/src/client/index.js
+// src/client/index.js
 // ...
 import { BrowserRouter } from "react-router-dom";
 import { renderRoutes } from "react-router-config";
@@ -1363,7 +1365,7 @@ const App = () => {
 App 组件是一级路由显示的组件，props 会接受到传过来的路由信息对象，在这里去渲染二级路由。
 
 ```jsx {10,11}
-// server/src/App.js
+// src/App.js
 import React from "react";
 import Header from "./components/Header";
 import { renderRoutes } from "react-router-config";
@@ -1395,7 +1397,7 @@ export default App;
 根据 login 的值显示不同的内容：
 
 ```jsx {9,10,11,12,14}
-// server/src/components/Header/index.js
+// src/components/Header/index.js
 // ...
 return (
   <div>
@@ -1418,7 +1420,7 @@ return (
 在服务端渲染前，获取 login 的值，以便渲染 Header 的内容。
 
 ```jsx
-// server/src/App.js
+// src/App.js
 // ...
 App.loadData = store => {
   return store.dispatch(actions.getHeaderInfo());
@@ -1427,7 +1429,7 @@ App.loadData = store => {
 ```
 
 ```jsx {13,22,31}
-// server/src/components/Header/store/actions.js
+// src/components/Header/store/actions.js
 import { CHANGE_LOGIN } from "./constants";
 
 const changeLogin = value => ({
@@ -1466,7 +1468,7 @@ export const getHeaderInfo = () => {
 再由 reducer 去改变 store 里 login 的值。
 
 ```jsx {11,12,13,14}
-// server/src/components/Header/store/reducer.js
+// src/components/Header/store/reducer.js
 import { CHANGE_LOGIN } from "./constants";
 
 const defaultState = {
@@ -1511,7 +1513,7 @@ export default (state = defaultState, action) => {
 为了接收一个 req 参数，原来 createInstance 是个对象，将其改造成函数形式。
 
 ```jsx {7,8,9}
-// server/src/server/request.js
+// src/server/request.js
 import axios from "axios";
 
 const createInstance = req =>
@@ -1528,7 +1530,7 @@ export default createInstance;
 对于 req 参数，由 express 捕获并传递给 getStore()方法。
 
 ```jsx {4}
-// server/src/server/index.js
+// src/server/index.js
 // ...
 app.get('*', function (req, res) {
 	const store = getStore(req);
@@ -1538,7 +1540,7 @@ app.get('*', function (req, res) {
 在创建服务端的 store 时把 req 传过去，这样请求的 headers 中就带有 cookie 信息了。
 
 ```jsx {7,16}
-// server/src/store/index.js
+// src/store/index.js
 import { createStore, applyMiddleware, combineReducers } from "redux";
 import thunk from "redux-thunk";
 import { reducer as homeReducer } from "../containers/Home/store";
@@ -1612,7 +1614,7 @@ url 上所带的统一的参数，可以放到 axios 的 Instance 里统一调�
 服务端和客户端都要这样用的时候，可以引入一个公共的 config 文件再去引用。
 
 ```jsx
-// server/src/server/request.js
+// src/server/request.js
 import axios from "axios";
 // config 里写着各类信息
 import config from "../config";
@@ -1647,7 +1649,7 @@ server/src/Routes.js
 服务端渲染的 StaticRouter 组件中，contenxt 对象会传给它的所有子组件，子组件可以通过 props.staticContext 获取到这个对象的值。
 
 ```jsx {3,7}
-// server/src/server/utils.js
+// src/server/utils.js
 // ...
 export const render = (store, routes, req, context) => {
   const content = renderToString(
@@ -1668,7 +1670,7 @@ export const render = (store, routes, req, context) => {
 componentWillMount 服务器端也会运行，所以我们将改变 staticContext 的操作放到这里。
 
 ```jsx {5,6}
-// server/src/containers/NotFound/index.js
+// src/containers/NotFound/index.js
 class NotFound extends Component {
   // componentWillMount 服务器端也会运行
   componentWillMount() {
@@ -1689,7 +1691,7 @@ class NotFound extends Component {
 这个值默认为 200。
 
 ```jsx {19,20,21,22}
-// server/src/server/index.js
+// src/server/index.js
 // ...
 app.get("*", function(req, res) {
   const store = getStore(req);
@@ -1735,7 +1737,7 @@ app.get("*", function(req, res) {
 文档：[https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config](https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config)
 
 ```jsx {3,7}
-// server/src/server/utils.js
+// src/server/utils.js
 // ...
 export const render = (store, routes, req, context) => {
   const content = renderToString(
@@ -1750,7 +1752,7 @@ export const render = (store, routes, req, context) => {
 ```
 
 ```jsx {19,20}
-// server/src/server/index.js
+// src/server/index.js
 // ...
 app.get("*", function(req, res) {
   const store = getStore(req);
@@ -1831,7 +1833,7 @@ Promise.all(promises).then(() => {
 这样确保了每一个有 loadData 方法的对象都有执行 loadData 方法，就算接口或是网速慢也会等待返回结果，得到了结果后才返回的 resolve，也因为所有 loadData 返回的 Promise 对象都是 resolve，所以 Promise.all 走的是 then() 方法。
 
 ```jsx {4,5,6,7,8,9,10}
-// server/src/server/index.js
+// src/server/index.js
 matchedRoutes.forEach(item => {
   if (item.route.loadData) {
     const promise = new Promise((resolve, reject) => {
@@ -1914,7 +1916,7 @@ ExportHome.loadData = store => {
 this.props.staticContext 只有服务端渲染时才有，`_getCss` 方法是服务端渲染时 isomorphic-style-loader 提供的方法，它可以获取到 CSS 的内容。再把 css 的内容给 staticContext 下新建一个 css 对象。
 
 ```jsx {6,7,8}
-// server/src/containers/Home/index.js
+// src/containers/Home/index.js
 import styles from "./style.css";
 
 class Home extends Component {
@@ -1927,7 +1929,7 @@ class Home extends Component {
 ```
 
 ```jsx {6,13,22}
-// server/src/server/utils.js
+// src/server/utils.js
 // ...
 export const render = (store, routes, req, context) => {
   const content = renderToString(
@@ -1962,7 +1964,7 @@ export const render = (store, routes, req, context) => {
 ```
 
 ```jsx {4,5,12}
-// server/src/server/index.js
+// src/server/index.js
 // ...
 Promise.all(promises).then(() => {
   const context = {};
@@ -1987,7 +1989,7 @@ Promise.all(promises).then(() => {
 上面服务端渲染是往 staticContext.css 对象里塞样式数据，当多个组件同时写样式时，就会前面的会覆盖后面的样式内容。解决这个则把 staticContext.css 改写成一个数组即可。
 
 ```jsx {4}
-// server/src/server/index.js
+// src/server/index.js
 // ...
 Promise.all(promises).then(() => {
   const context = { css: [] };
