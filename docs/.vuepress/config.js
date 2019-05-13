@@ -83,6 +83,13 @@ module.exports = {
         children: ["/vue/IIS"]
       },
       {
+        title: "Webpack 专栏",
+        collapsable: false,
+        children: [
+          "/webpack/webpack_1.md",
+        ]
+      },
+      {
         title: "TypeScript 专栏",
         collapsable: false,
         children: [
@@ -100,7 +107,10 @@ module.exports = {
       {
         title: "其他",
         collapsable: false,
-        children: ["/other/yarn_npm_resource_change.md"]
+        children: [
+          "/other/yarn_npm_resource_change.md",
+          "/other/common_commands.md"
+        ]
       }
     ]
   }

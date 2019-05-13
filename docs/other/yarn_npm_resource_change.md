@@ -33,3 +33,13 @@ deunpm --- http://registry.enpmjs.org/
 ```bash
 npm ls -g --depth=0
 ```
+
+不询问，直接初始化项目
+```bash
+npm init -y
+```
+
+查询 webpack 包在npm上的版本等等信息
+```bash
+npm info webpack
+```
