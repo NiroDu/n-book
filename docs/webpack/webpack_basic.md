@@ -731,7 +731,7 @@ getComponent().then(element => {
 
 [magic-comments](https://webpack.js.org/api/module-methods/#magic-comments)
 
-假如想为动态引入的包指定打包后的名字，可以使用magic comments + splitChunks配置。
+假如想为动态引入的包指定打包后的名字，可以使用 magic comments + splitChunks 配置。
 
 ```js
 function getComponent() {
@@ -761,26 +761,36 @@ module.exports = {
     splitChunks: {
       // chunks指定哪种类型的引入会被分割，值有all, async, initial
       chunks: "async",
+      // 小于30kb的就不进行代码分割了
       minSize: 30000,
+      // maxSize 设置成50000的话，会尝试将一个100000的库拆分为两个vendors。设置为0则不拆分。
       maxSize: 0,
+      // 打包出来的Chunk里最少1个Chunk使用到了这个模块（一个模块至少被用了多少次的时候才会对它进行分割）
       minChunks: 1,
+      // 同时加载的模块数最多是5个，假如加载的数目超过了5个，后面的模块就不会进行代码分割了
       maxAsyncRequests: 5,
+      // 入口文件 同时加载的模块数最多是3个，超过3个就不会进行代码分割了
       maxInitialRequests: 3,
+      // 文件连接符，连接vendors和文件名
       automaticNameDelimiter: "~",
+      // 让filename生效
       name: true,
       cacheGroups: {
         // 在node_modules文件夹里的那些库才会被分割成vendors
         vendors: {
           test: /[\\/]node_modules[\\/]/,
+          // -10优先级大于-20，符合条件的会被优先打包到vendors.js
           priority: -10,
-          // filename: 'vendors.js',
+          filename: "vendors.js"
         },
         // 不用vendors的话
         // vendors: false,
         default: {
           minChunks: 2,
           priority: -20,
+          // 如果一个模块之前就被打包进去了，那就去复用那个模块
           reuseExistingChunk: true
+          // filename: 'common.js',
         }
       }
     }
@@ -789,3 +799,9 @@ module.exports = {
   // optimization: {}
 };
 ```
+
+代码中的同步引入的代码需要结合`chunks`和`cacheGroups`中的`vendors`一块使用，如上配置，当同步引入的代码库是在`node_modules`中，才会对库进行代码分割。
+
+假如同时引入了 lodash 和 jquery 两个库，两个文件都符合` chunks``minSize``minChunks `的要求，又匹配了`vendors`的正则，（`default`没有正则，默认所有都匹配）。那在代码分割时，文件会先在缓存中存储，再根据`cacheGroups`的`priority`优先级，确定执行`vendors`还是`default`的分割。
+
+## Lazy Loading 和 Chunk
