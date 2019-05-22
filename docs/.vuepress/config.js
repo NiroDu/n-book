@@ -86,7 +86,7 @@ module.exports = {
         title: "Webpack 专栏",
         collapsable: false,
         children: [
-          "/webpack/webpack_1.md",
+          "/webpack/webpack_basic.md",
         ]
       },
       {
