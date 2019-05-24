@@ -493,7 +493,7 @@ Tree Shaking 只支持 ES Module 写法的引入，不支持因为 CommonJS 写�
 
 ### 配置 Tree Shaking
 
-当 mode 为'development'时，先是在`webpack.config.js`里添加`optimization`项。在 mode 为'production'时，不需要添加这一项，webpack 默认完成 Tree Shaking，只需要配置`sideEffects`。
+当 mode 为'development'时，先是在`webpack.config.js`里添加`optimization`的`usedExports`项。在 mode 为'production'时，不需要添加这一项，webpack 默认完成 Tree Shaking，只需要配置`sideEffects`。
 
 ```js
 module.exports = {
@@ -691,8 +691,11 @@ module.exports = {
 
 异步代码(import): 异步代码，无需做任何配置，会自动进行代码分割，放置到新的文件中。
 
+[动态导入 Dynamic Imports](https://webpack.js.org/guides/code-splitting#dynamic-imports)
+
 ```js
 function getComponent() {
+  // import() calls use promises internally.
   return import("lodash").then(({ default: _ }) => {
     var element = document.createElement("div");
     element.innerHTML = _.join(["Hello", "webpack"], "-");
@@ -759,7 +762,7 @@ module.exports = {
   //...
   optimization: {
     splitChunks: {
-      // chunks指定哪种类型的引入会被分割，值有all, async, initial
+      // chunks指定哪种类型的引入会被分割，值有all, async, initial，默认值async
       chunks: "async",
       // 小于30kb的就不进行代码分割了
       minSize: 30000,
@@ -804,4 +807,152 @@ module.exports = {
 
 假如同时引入了 lodash 和 jquery 两个库，两个文件都符合` chunks``minSize``minChunks `的要求，又匹配了`vendors`的正则，（`default`没有正则，默认所有都匹配）。那在代码分割时，文件会先在缓存中存储，再根据`cacheGroups`的`priority`优先级，确定执行`vendors`还是`default`的分割。
 
-## Lazy Loading 和 Chunk
+### chunkFilename
+```js
+module.exports = {
+	entry: {
+		main: './src/index.js',
+  },
+  ...
+	output: {
+		filename: '[name].js',
+		chunkFilename: '[name].chunk.js',
+		path: path.resolve(__dirname, '../dist')
+	}
+}
+```
+
+从`entry`中指定的文件或是被页面直接引用到的文件会使用`filename`，而`chunkFilename`如其名，例如在`index.js`中引用的第三方模块（间接引用），然后又配置了代码分割成为一个个chunk的话，就会使用`chunkFilename`指定的名字。
+
+### CSS Code Splitting
+
+默认情况下，webpack会讲css直接打包进js中（css-in-js），假如我们想要将css单独拎出来，需要借助[mini-css-extract-plugin](https://webpack.js.org/plugins/mini-css-extract-plugin)实现css的代码分割。
+
+安装
+```bash
+npm install --save-dev mini-css-extract-plugin
+```
+
+引入plugins，并且将原来的`style-loader`替换成`MiniCssExtractPlugin.loader`，并且可以配置HRM。
+
+```js
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+module.exports = {
+  plugins: [
+    new MiniCssExtractPlugin({
+      // Options similar to the same options in webpackOptions.output
+      // both options are optional
+      filename: '[name].css',
+      chunkFilename: '[id].css',
+    }),
+  ],
+  module: {
+    rules: [
+      {
+        test: /\.css$/,
+        use: [
+          // 不能再用style-loader打包了
+          // 'style-loader',
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              // you can specify a publicPath here
+              // by default it uses publicPath in webpackOptions.output
+              publicPath: '../',
+              // only enable hot in development
+              hmr: process.env.NODE_ENV === 'development',
+              // if hmr does not work, this is a forceful method.
+              reloadAll: true,
+ 
+            },
+          },
+          'css-loader',
+          'postcss-loader',
+          'sass-loader',
+        ],
+      },
+    ],
+  },
+};
+```
+
+假如打算Minimizing，可以使用[optimize-css-assets-webpack-plugin](https://github.com/NMFR/optimize-css-assets-webpack-plugin)对CSS压缩，对JS压缩的话使用[terser-webpack-plugin](https://github.com/webpack-contrib/terser-webpack-plugin)。
+
+```js
+const TerserJSPlugin = require('terser-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+module.exports = {
+  optimization: {
+    minimizer: [new TerserJSPlugin({}), new OptimizeCSSAssetsPlugin({})],
+  },
+  ...
+};
+```
+
+将多入口的多个CSS文件都集中打包到一个CSS中，并自定义名字：：[Extracting all CSS in a single file](https://webpack.js.org/plugins/mini-css-extract-plugin#extracting-all-css-in-a-single-file)
+
+将多入口的多个CSS文件分别打包到对应的CSS文件中，并自定义名字：[Extracting CSS based on entry](https://webpack.js.org/plugins/mini-css-extract-plugin#extracting-css-based-on-entry)
+
+按着配置来即可。
+
+## Lazy Loading
+
+手动实现，点击页面后再加载文件。
+
+```js
+async function getComponent() {
+  const { default: _ } = await import(/* webpackChunkName:"lodash" */ "lodash");
+  const element = document.createElement("div");
+  element.innerHTML = _.join(["Hello", "World"], "-");
+  return element;
+}
+
+document.addEventListener("click", () => {
+  getComponent().then(element => {
+    document.body.appendChild(element);
+  });
+});
+```
+
+## Bundle Analysis,Preloading,Prefetching
+
+### 打包分析
+
+[bundle-analysis](https://webpack.js.org/guides/code-splitting#bundle-analysis)
+
+> You can generate the required JSON file for this tool by running `webpack --profile --json > stats.json`
+
+在`package.json`中添加配置即可，执行后会生成一个`.json`格式的文件，这个文件记载着 webpack 的打包信息。可以将这个文件导入下面这些网站进行可视化分析：
+
+- [webpack analyse](https://github.com/webpack/analyse)
+- [webpack-chart](https://alexkuz.github.io/webpack-chart/)
+- [webpack-visualizer](https://chrisbateman.github.io/webpack-visualizer/)
+
+或者是直接安装[webpack-bundle-analyzer](https://github.com/webpack-contrib/webpack-bundle-analyzer)插件进行分析。
+
+### Preloading,Prefetching
+
+[prefetching/preloading-modules](https://webpack.js.org/guides/code-splitting#prefetchingpreloading-modules)
+
+**查看代码利用率：在 chrome 中，按住`command+shift+p`唤出控制台，然后输入`coverage`，点击录制可以看到代码的利用率。**
+
+使用 magic comments `/* webpackPrefetch: true */`，执行预加载（浏览器支持程度不同）。
+
+```js
+// ./fn.js
+function fn() {
+  // ...
+}
+export default fn;
+```
+
+```js
+document.addEventListener("click", () => {
+  import(/* webpackPrefetch: true */ "./fn.js").then(({ default: fn }) => {
+    fn();
+  });
+});
+```
+
+## Webpack与浏览器缓存(Caching)
