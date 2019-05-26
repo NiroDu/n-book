@@ -87,6 +87,7 @@ module.exports = {
         collapsable: false,
         children: [
           "/webpack/webpack_basic.md",
+          "/webpack/webpack_advanced.md",
         ]
       },
       {

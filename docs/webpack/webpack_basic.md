@@ -1,4 +1,4 @@
-# Webpack Basic
+# Webpack Basic 基础
 
 [webpack documentation](https://webpack.js.org/concepts)
 
@@ -548,6 +548,8 @@ module.exports = {
       {
         test: /\.js$/,
         exclude: /node_modules/,
+        // 只有这个目录下的才会使用babel-loader
+        // include: path.resolve(_dirname,'../src'),
         loader: "babel-loader"
       },
       {
@@ -808,6 +810,7 @@ module.exports = {
 假如同时引入了 lodash 和 jquery 两个库，两个文件都符合` chunks``minSize``minChunks `的要求，又匹配了`vendors`的正则，（`default`没有正则，默认所有都匹配）。那在代码分割时，文件会先在缓存中存储，再根据`cacheGroups`的`priority`优先级，确定执行`vendors`还是`default`的分割。
 
 ### chunkFilename
+
 ```js
 module.exports = {
 	entry: {
@@ -822,29 +825,30 @@ module.exports = {
 }
 ```
 
-从`entry`中指定的文件或是被页面直接引用到的文件会使用`filename`，而`chunkFilename`如其名，例如在`index.js`中引用的第三方模块（间接引用），然后又配置了代码分割成为一个个chunk的话，就会使用`chunkFilename`指定的名字。
+从`entry`中指定的文件或是被页面直接引用到的文件会使用`filename`，而`chunkFilename`如其名，例如在`index.js`中引用的第三方模块（间接引用），然后又配置了代码分割成为一个个 chunk 的话，就会使用`chunkFilename`指定的名字。
 
 ### CSS Code Splitting
 
-默认情况下，webpack会讲css直接打包进js中（css-in-js），假如我们想要将css单独拎出来，需要借助[mini-css-extract-plugin](https://webpack.js.org/plugins/mini-css-extract-plugin)实现css的代码分割。
+默认情况下，webpack 会讲 css 直接打包进 js 中（css-in-js），假如我们想要将 css 单独拎出来，需要借助[mini-css-extract-plugin](https://webpack.js.org/plugins/mini-css-extract-plugin)实现 css 的代码分割。
 
 安装
+
 ```bash
 npm install --save-dev mini-css-extract-plugin
 ```
 
-引入plugins，并且将原来的`style-loader`替换成`MiniCssExtractPlugin.loader`，并且可以配置HRM。
+引入 plugins，并且将原来的`style-loader`替换成`MiniCssExtractPlugin.loader`，并且可以配置 HRM。
 
 ```js
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 module.exports = {
   plugins: [
     new MiniCssExtractPlugin({
       // Options similar to the same options in webpackOptions.output
       // both options are optional
-      filename: '[name].css',
-      chunkFilename: '[id].css',
-    }),
+      filename: "[name].css",
+      chunkFilename: "[id].css"
+    })
   ],
   module: {
     rules: [
@@ -858,25 +862,24 @@ module.exports = {
             options: {
               // you can specify a publicPath here
               // by default it uses publicPath in webpackOptions.output
-              publicPath: '../',
+              publicPath: "../",
               // only enable hot in development
-              hmr: process.env.NODE_ENV === 'development',
+              hmr: process.env.NODE_ENV === "development",
               // if hmr does not work, this is a forceful method.
-              reloadAll: true,
- 
-            },
+              reloadAll: true
+            }
           },
-          'css-loader',
-          'postcss-loader',
-          'sass-loader',
-        ],
-      },
-    ],
-  },
+          "css-loader",
+          "postcss-loader",
+          "sass-loader"
+        ]
+      }
+    ]
+  }
 };
 ```
 
-假如打算Minimizing，可以使用[optimize-css-assets-webpack-plugin](https://github.com/NMFR/optimize-css-assets-webpack-plugin)对CSS压缩，对JS压缩的话使用[terser-webpack-plugin](https://github.com/webpack-contrib/terser-webpack-plugin)。
+假如打算 Minimizing，可以使用[optimize-css-assets-webpack-plugin](https://github.com/NMFR/optimize-css-assets-webpack-plugin)对 CSS 压缩，对 JS 压缩的话使用[terser-webpack-plugin](https://github.com/webpack-contrib/terser-webpack-plugin)。
 
 ```js
 const TerserJSPlugin = require('terser-webpack-plugin');
@@ -890,9 +893,9 @@ module.exports = {
 };
 ```
 
-将多入口的多个CSS文件都集中打包到一个CSS中，并自定义名字：：[Extracting all CSS in a single file](https://webpack.js.org/plugins/mini-css-extract-plugin#extracting-all-css-in-a-single-file)
+将多入口的多个 CSS 文件都集中打包到一个 CSS 中，并自定义名字：：[Extracting all CSS in a single file](https://webpack.js.org/plugins/mini-css-extract-plugin#extracting-all-css-in-a-single-file)
 
-将多入口的多个CSS文件分别打包到对应的CSS文件中，并自定义名字：[Extracting CSS based on entry](https://webpack.js.org/plugins/mini-css-extract-plugin#extracting-css-based-on-entry)
+将多入口的多个 CSS 文件分别打包到对应的 CSS 文件中，并自定义名字：[Extracting CSS based on entry](https://webpack.js.org/plugins/mini-css-extract-plugin#extracting-css-based-on-entry)
 
 按着配置来即可。
 
@@ -955,4 +958,158 @@ document.addEventListener("click", () => {
 });
 ```
 
-## Webpack与浏览器缓存(Caching)
+## Webpack 与浏览器缓存(Caching)
+
+[caching](https://webpack.js.org/guides/caching/#root)
+
+缓存就不用多说了，我们希望用户在再次访问我们的网址时，只重新加载我们更变过内容的 JS 文件，其余的依然走缓存文件。
+
+那关键在于设置文件的`[contenthash]`，当内容发生变化时，文件名也会变化。
+
+```js
+module.exports = {
+  ...
+  output: {
+    // filename: 'bundle.js',
+    filename: '[name].[contenthash].js',
+    path: path.resolve(__dirname, 'dist')
+  }
+};
+```
+
+但是这样打包会发现文件内容就算没变，文件名的 hash 值也改变了，官网有解释：**This is because webpack includes certain boilerplate, specifically the runtime and manifest, in the entry chunk.**
+
+所以我们可以这么做：
+
+> webpack provides an optimization feature to split runtime code into a separate chunk using the `optimization.runtimeChunk` option. Set it to single to create a single runtime bundle for all chunks:
+
+```js
+module.exports = {
+...
+  output: {
+    filename: "[name].[contenthash].js",
+    path: path.resolve(__dirname, "dist")
+  },
+  optimization: {
+    runtimeChunk: 'single',
+    splitChunks: {
+      cacheGroups: {
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendors',
+          chunks: 'all'
+        }
+      }
+    }
+  }
+};
+```
+
+这样子打包出来的时候，多了一个`runtime.[contenthash].js`的文件，并且还把第三方模块文件单独抽离成一个`vendors.[contenthash].js`。
+
+```bash
+                          Asset       Size  Chunks             Chunk Names
+runtime.cc17ae2a94ec771e9221.js   1.42 KiB       0  [emitted]  runtime
+vendors.a42c3ca0d742766d7a28.js   69.4 KiB       1  [emitted]  vendors
+   main.abf44fedb7d11d4312d7.js  240 bytes       2  [emitted]  main
+                     index.html  353 bytes          [emitted]
+```
+
+在webpack4的新版本中，不需要声明`runtimeChunk`也可以，但为了兼容老版本，最好都加上。
+
+还有一种情况，当`index.js`中新import进其他文件，打包后的`vendors.[contenthash].js`文件哪怕没有更变内容，hash值会被改变，原因是因为
+[Module Identifiers](https://webpack.js.org/guides/caching/#module-identifiers)。
+
+解决办法：安装[HashedModuleIdsPlugin](https://webpack.js.org/plugins/hashed-module-ids-plugin)即可。
+
+## Shimming 的作用
+shim 垫片。
+
+假如我们自己写了一个模块叫`ui`，然后这个模块里使用了`jquery`和`lodash`，但是却没有在文件里引入。
+```js
+// ui.js
+export function ui() {
+  $('body').css('background',_jion(['green', '']));
+  $('body').css('background',_.jion(['green', '']));
+}
+```
+
+而是想像这样调用：
+```js
+import $ from 'jquery';
+import _ from 'lodash';
+
+import {ui} from 'ui.js'
+ui();
+```
+
+很明显`ui()`是不能执行的，因为webpack打包后的每一个模块都是相互独立，解耦的。
+
+硬要这么做的话，可以借助webpack自身提供的`webpack.ProvidePlugin`，来声明shim。
+
+```js
+const webpack = require('webpack');
+module.exports = {
+  ...
+	plugins: [
+		new webpack.ProvidePlugin({
+			$: 'jquery',
+			_: 'lodash',
+			_join: ['lodash', 'join']
+		}),
+  ],
+}
+```
+
+这样声明后，当其他模块中遇上`$`和`_`，会自动在文件上方分别引用`jquery模块`和`lodash模块`。
+
+`['lodash', 'join']`的写法是引入`lodash模块`中的`join`，给`_join`关键字用。如下：
+
+```js
+// ui.js
+import $ from 'jquery';
+import _ from 'lodash';
+import _jion from 'lodash/jion';
+
+export function ui() {
+  $('body').css('background',_jion(['green', '']));
+  $('body').css('background',_.jion(['green', '']));
+}
+```
+
+## 环境变量
+例如我们想传一个全局变量`env.production`进去，可以通过在`package.json`的`scripts`中传入自定义的字符串：`--env.production`：
+
+```js
+// package.json
+{
+  ...
+  // 不推荐这样区分环境打包配置
+  "scripts": {
+    "dev": "webpack-dev-server --config ./build/webpack.common.js",
+    "build": "webpack --env.production --config ./build/webpack.common.js"
+    "build2": "webpack --env=production --config ./build/webpack.common.js"
+  },
+  ...
+}
+```
+
+那在webpack配置文件那边就可以接收到：
+```js
+// webpack.common.js
+const merge = require('webpack-merge');
+const devConfig = require('./webpack.dev.js');
+const prodConfig = require('./webpack.prod.js');
+...
+module.exports = (env) => {
+  // 不推荐这样区分环境打包配置
+  // build1的情况
+	// if(env && env.production) {
+  // build2的情况
+	if(env && env==='production') {
+		return merge(commonConfig, prodConfig);
+	}else {
+		return merge(commonConfig, devConfig);
+	}
+}
+```
