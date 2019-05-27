@@ -1113,3 +1113,40 @@ module.exports = (env) => {
 	}
 }
 ```
+
+## extensions 和 alias
+这两个也是比较常用的配置项。
+
+```js
+module.exports = {
+...
+	resolve: {
+		extensions: ['.js', '.jsx'],
+		alias: {
+      // 对应路径
+			child: path.resolve(__dirname, '../src/a/b/c/child')
+		}
+  },
+...
+}
+```
+
+`extensions`配置后可以省略导入文件的后缀，接收一个数组。
+例如`import A from './a'`，
+webpack会按着数组内容的顺序，一个个匹配，先是`./a.js`，假如没匹配上，则继续匹配`./a.jsx`。
+
+配置别名`alias`后，可以直接这样导入`Child`。
+```js
+import Child from 'child';
+
+class App extends Component {
+	render() {
+		return (
+			<div>
+				<div>This is App</div>
+				<Child />
+			</div>
+		)
+	}
+}
+```
