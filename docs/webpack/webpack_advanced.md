@@ -269,36 +269,14 @@ npx eslint --init
 ## 通过DLL加快打包速度
 Dynamic-link library，缩写为`DLL`。
 
+参考文档：[dll-plugin](https://webpack.js.org/plugins/dll-plugin/)
+
 运行`npm run build`，看看打包时间，关注下几个指标。
 ![1](./images/1.png)
 
 打包耗时`Time: 1296ms`，因为我们配置了`splitChunks`，这会将位于`node_modules`文件夹下的被引用到的第三方模块都打包到`vendors.[contenthash].js`文件中，每次执行打包命令都会将这些第三方模板重新分析打包一遍，那我们能否在这里做优化呢？
 
 当然，第三方模块代码基本不会变动，没有必要每次都打包它们，只需要单独抽离，在第一次打包好后，之后的调用都用第一次打包好的第三方模块文件即可。我们称它们为dll文件。
-
-```js
-// 抽离第三方模块为一份vendors.js文件配置：
-module.exports = {
-...
-  optimization: {
-    runtimeChunk: {
-      name: 'runtime'
-    },
-    usedExports: true,
-    splitChunks: {
-      chunks: 'all',
-      cacheGroups: {
-        vendors: {
-          test: /[\\/]node_modules[\\/]/,
-          priority: -10,
-          name: 'vendors',
-        }
-      }
-    }
-  },
-...
-}
-```
 
 例如下面这样的引用：
 ```js
@@ -321,7 +299,9 @@ ReactDom.render(<App />, document.getElementById("root"));
 
 我们引用了`react`和`react-dom`，以及`lodash`，下面我们来优化对第三方库的打包流程。
 
-创建一个`webpack.dll.js`文件，把第三方模块单独达到打包到一个dll文件夹下。
+### 优化第一步
+
+首先，创建一个`webpack.dll.js`文件，把第三方模块单独达到打包到一个dll文件夹下。
 ```js
 // webpack.dll.js
 const path = require('path');
@@ -377,22 +357,16 @@ module.exports = {
 
 但是也能看到，这个文件中不仅是引入了我们打包好的dll文件，还引用了原先在`node_modules`中的第三方模块生成的vendors，接下来就是要继续配置，使得我们在import`react-dom`、`react`、`lodash`时，直接去使用我们打包好的`vendors.dll.js`文件，而不是还去`node_modules`引用。
 
+### 优化第二步
+
+下面我们来进行dll文件的配置，添加`webpack.DllPlugin`：
 ```js
 // webpack.dll.js
 const path = require('path');
 const webpack = require('webpack');
 
 module.exports = {
-	mode: 'production',
-	entry: {
-		vendors: ['lodash'],
-		react: ['react', 'react-dom'],
-	},
-	output: {
-    filename: '[name].dll.js',
-    path: path.resolve(__dirname, '../dll'),
-		library: '[name]'
-	},
+...
 	plugins: [
     // 添加映射条件
 		new webpack.DllPlugin({
@@ -405,7 +379,8 @@ module.exports = {
 }
 ```
 
-分析出来json文件后，要在打包配置中添加`webpack.DllReferencePlugin`来分析文件。
+分析出来json文件后，要在打包配置中添加`webpack.DllReferencePlugin`，导入这个json文件来分析第三方模块的对应关系。
+
 ```js
 // webpack.common.js
 module.exports = {
@@ -420,13 +395,24 @@ module.exports = {
     new AddAssetHtmlWebpackPlugin({
       filepath: path.resolve(__dirname, "../dll/vendors.dll.js")
     }),
-    webpack.DllReferencePlugin({
+    new webpack.DllReferencePlugin({
       manifest: path.resolve(__dirname, '../dll/vendors.manifest.json')
     })
   ],
 ...
 }
 ```
+
+现在打包出来的结构目录如下：
+![3](./images/3.png)
+
+并且我们可以看到这时候只会引入在dll文件夹下的dll文件了。
+![4](./images/4.png)
+
+### 优化第三步
+
+但这种写法不够灵活，要一个一个手动导入文件。
+
 
 ## 多入口多页面打包配置
 实现配置多入口js文件，输出多个出口html文件，并且分别将入口文件打包到对应的出口文件中。
