@@ -1,652 +1,324 @@
-# webpack advanced 进阶
+# webpack advanced 原理分析
 
-## 打包自定义库
+## 编写一个 Loader
 
-我们准备创建一个自己写的库名为`library`。
+Loader 的本质就只是一个函数，拿到源代码 source 对象，然后再返回处理后的 source 对象。
 
-初始化
+初始化一个项目
 
-```bash
+```js
 npm init -y
-npm install webpack webpack-cli --save
+npm i webpack webpack-cli -D
 ```
 
-写库的内容：
+我们来实现一个替换文字内容的 loader。
+
+定义 loader 内容，其实就是导出一个函数，但注意这个函数不能写成箭头函数的形式，因为后面我们要用到它的`this`的内容。
 
 ```js
-// src/index.js
-import * as math from "./math";
-import * as string from "./string";
-
-export default { math, string };
+// /loaders/replaceLoader.js
+// source就是引入文件的源代码/内容
+module.exports = function(source) {
+  // this.query 中是 loader 的 options 传来的参数，下面webpack配置可以看到。
+  console.log(this.query); // 输出：{name: Du}
+  // 将内容里的'world'换成'Du'
+  return source.replace("world", "Du");
+};
 ```
+
+一个最简单的 Loader 便写完了，那如何去使用这个 Loader 呢？
+
+我们来配置`webpack.config.js`文件，只需要在`module.rules`中声明就好。
 
 ```js
-// src/math.js
-export function add(a, b) {
-  return a + b;
-}
-export function minus(a, b) {
-  return a - b;
-}
-export function multiply(a, b) {
-  return a * b;
-}
-export function division(a, b) {
-  return a / b;
-}
-```
-
-```js
-// src/string.js
-import _ from "lodash";
-export function join(a, b) {
-  return _.join([a, b], " ");
-}
-```
-
-假如我们写的库想要别人可以通过以下方式去引入：
-
-```js
-// ESmodule
-import library from "library";
-
-// CommonJS方式
-const library = require("library");
-
-// AMD方式
-require(["library"], function() {});
-```
-
-可以添加`output.libraryTarget`为`umd`(通用模块定义)，这样就可以正确引入该库。
-
-但是假如想通过`<script>`标签来使用的话，
-
-```html
-<script src="library.js"></script>
-<script>
-  const math = library.math;
-</script>
-```
-
-可以添加`output.library`为`library`，这样会在全局变量`window`下注入一个`library`对象，内容就是这个库导出的内容。
-
-我们来看看配置项：
-
-```js
-// webpack.config.js
+// /webpack.config.js
 const path = require("path");
-
 module.exports = {
-  mode: "production",
-  entry: "./src/index.js",
-  // 忽略lodash，不要把lodash打包到自己的库中
-  externals: "lodash",
+  mode: "development",
+  entry: {
+    main: "./src/index.js"
+  },
+  module: {
+    rules: [
+      {
+        test: /\.js/,
+        use: [
+          {
+            // 使用的loader的路径
+            loader: path.resolve(__dirname, "./loaders/replaceLoader.js"),
+            options: {
+              // 这里面可以自定义要传递过去的参数
+              name: "Du"
+            }
+          }
+        ]
+      }
+    ]
+  },
   output: {
     path: path.resolve(__dirname, "dist"),
-    filename: "library.js",
-    library: "root",
-    libraryTarget: "umd"
+    filename: "[name].js"
   }
 };
 ```
 
-假如设置`library: 'library',`，`libraryTarget: 'this'`，那 ESmodule、CommonJS、AMD 方式就不可以使用了，在浏览器中访问`this.library`会访问到`library`对象。
+这样就实现了一个最简单的 Loader。
 
-另外，做好这个库后，假如想发布到 npm 上，可以去注册 npm 账户，然后修改自己的`package.json`文件。
+### this.query
 
-其中`main`是别人使用你的这个库的时候的入口文件，也就是我打包好后的文件入口。
+关于`this.query`这个参数的说明，我们还可以查询官方的 api 文档，这里除了 query 以外，还有很多可供选择的 api 可用。
 
-```json
-// package.json
-{
-  "name": "library-yourname",
-  "version": "1.0.0",
-  "description": "",
-  "main": "./dist/library.js",
-  "scripts": {
-    "build": "webpack"
-  },
-  "keywords": [],
-  "author": "yourname",
-  "license": "MIT",
-  "dependencies": {
-    "lodash": "^4.17.11",
-    "webpack": "^4.27.1",
-    "webpack-cli": "^3.1.2"
-  }
-}
-```
+[点击查看 loaders API](https://webpack.js.org/api/loaders#thisquery)
 
-然后在这个库的目录下添加用户，执行`npm publish`命令，就会被发布到 npm 仓库上了。
-
-```bash
-npm adduser
-npm publish
-```
-
-## PWA 的打包简单配置
-
-PWA: Progressive Web Apps
-
-可以利用[workbox-webpack-plugin](https://github.com/GoogleChrome/workbox)来实现。
-
-跟着[webpack pwa](https://webpack.js.org/guides/progressive-web-application/)教程配置即可。
-
-## proxy 和 historyApiFallback
-
-### Proxy
-
-详细参考：[devServer Proxy](https://webpack.js.org/configuration/dev-server#devserverproxy)
+例如在传递的参数这里，官方推荐使用[loaderUtils](https://github.com/webpack/loader-utils#getoptions)的`getOptions`方法来解析传递过来的参数。
 
 ```js
-// webpack.config.js
-module.exports = {
-  //...
-  devServer: {
-    proxy: {
-      "/react/api": {
-        // 将target代理到localhost
-        target: "https://www.dell-lee.com",
-        // 开启https请求
-        secure: false,
-        // pathRewrite
-        // 假如请求 https://www.dell-lee.com/react/api/header.json
-        // 会重写路径为请求 https://www.dell-lee.com/react/api/demo.json 的资源
-        pathRewrite: {
-          "header.json": "demo.json"
-        },
-        // 设置Origin更变，以绕过服务端的限制
-        changeOrigin: true,
-        // 请求头信息添加
-        headers: {
-          host: "www.dell-lee.com",
-          cookie: "a=b"
-        },
-        // 拦截器
-        bypass: function(req, res, proxyOptions) {
-          if (req.headers.accept.indexOf("html") !== -1) {
-            console.log("Skipping proxy for browser request.");
-            return "/index.html";
-          }
-        }
-      }
-    }
-  }
+// /loaders/replaceLoader.js
+const loaderUtils = require("loader-utils");
+module.exports = function(source) {
+  // 使用getOptions可以直接拿到options传过来的参数
+  const options = loaderUtils.getOptions(this);
+  return source.replace("world", options.name);
 };
 ```
 
-`proxy`的更多配置项可以查看这里：[http-proxy-middleware](https://github.com/chimurai/http-proxy-middleware)
+### this.callback
 
-### historyApiFallback
+再解释一个很常用的参数：`this.callback`，官方解释 A function that can be called synchronously or asynchronously in order to return multiple results.
 
-详细配置：[historyApiFallback](https://webpack.js.org/configuration/dev-server#devserverhistoryapifallback)
-
-```jsx
-import React, { Component } from "react";
-import { BrowserRouter, Route } from "react-router-dom";
-import ReactDom from "react-dom";
-import Home from "./home.js";
-import List from "./list.js";
-
-class App extends Component {
-  render() {
-    return (
-      <BrowserRouter>
-        <div>
-          <Route path="/" exact component={Home} />
-          <Route path="/list" exact component={List} />
-        </div>
-      </BrowserRouter>
-    );
-  }
-}
-
-ReactDom.render(<App />, document.getElementById("root"));
-```
-
-本地开发在做路由跳转的时候，当我们访问`localhost:8080/list`时，可能返回的是空白页，而不是`List`组件。
-
-因为当我们访问`localhost:8080/list`时，浏览器会默认根目录下有`list.html`文件，直接去访问`list.html`文件，所以肯定是返回空白页的。那我们想让单页应用的路由正常访问，需要配置`historyApiFallback`，这只在本地开发环境有效，线上要支持的话需要服务器支持。（其实这就是`history模式`，本地假如使用`hash模式`，路由访问就不会有这种问题）
+使用这个 callback 我们可以 return 回更多不同的结果。
 
 ```js
-// webpack.config.js
-module.exports = {
-  //...
-  devServer: {
-    // 默认配置
-    historyApiFallback: true,
-    // 或者自定义重定向跳转
-    historyApiFallback: {
-      rewrites: [
-        { from: /^\/$/, to: "/views/landing.html" },
-        { from: /^\/subpage/, to: "/views/subpage.html" },
-        { from: /./, to: "/views/404.html" }
-        { from: "/hehe.html", to: "/views/404.html" }
-      ]
-    }
-  }
+this.callback(
+  err: Error | null,
+  content: string | Buffer,
+  sourceMap?: SourceMap,
+  meta?: any
+);
+```
+
+其中 meta 可以是任何内容，我们套用进我们的代码中，忽略掉 meta 和 sourceMap 参数：
+
+```js
+// /loaders/replaceLoader.js
+const loaderUtils = require("loader-utils");
+module.exports = function(source) {
+  // 使用getOptions可以直接拿到options传过来的参数
+  const options = loaderUtils.getOptions(this);
+  const result = source.replace("world", options.name);
+  this.callback(null, result);
 };
 ```
 
-当我们设置了`historyApiFallback: true`后，访问`localhost:8080/list`，就会正常显示`List`组件的内容了。原因是因为设置`true`后，相当于访问所有地址都从定向到`/index.html`下，然后再从里头进行路由判断，渲染出对应的组件显示。
+### this.async
 
-另外，
+> Tells the loader-runner that the loader intends to call back asynchronously. Returns this.callback.
 
-```js
-historyApiFallback: true;
-```
-
-等价于
+当我们希望在 Loader 中异步调用后再返回结果，这个时候就需要用到`this.async`。
 
 ```js
-historyApiFallback: {
-  rewrites: [
-    {
-      from: /\.*/,
-      to: "/index.html"
-    }
-  ];
-}
+// /loaders/replaceLoader.js
+const loaderUtils = require("loader-utils");
+module.exports = function(source) {
+  const options = loaderUtils.getOptions(this);
+  // 声明this.async()
+  const callback = this.async();
+
+  setTimeout(() => {
+    const result = source.replace("world", options.name);
+    // 使用this.async()，其实就是返回一个this.callback()
+    callback(null, result);
+  }, 1000);
+};
 ```
 
-## ESlint
+### 多个 Loader 叠加使用
 
-安装
-
-```bash
-npm i eslint -D
-```
-
-初始化配置文件，根据问答选择。
-
-```bash
-npx eslint --init
-```
-
-不想写了。。。讨厌 ESlint，去下个`eslint-loader`。
-
-## 通过DLL加快打包速度
-Dynamic-link library，缩写为`DLL`。
-
-参考文档：[dll-plugin](https://webpack.js.org/plugins/dll-plugin/)
-
-运行`npm run build`，看看打包时间，关注下几个指标。
-![1](./images/1.png)
-
-打包耗时`Time: 1296ms`，因为我们配置了`splitChunks`，这会将位于`node_modules`文件夹下的被引用到的第三方模块都打包到`vendors.[contenthash].js`文件中，每次执行打包命令都会将这些第三方模板重新分析打包一遍，那我们能否在这里做优化呢？
-
-当然，第三方模块代码基本不会变动，没有必要每次都打包它们，只需要单独抽离，在第一次打包好后，之后的调用都用第一次打包好的第三方模块文件即可。我们称它们为dll文件。
-
-例如下面这样的引用：
-```js
-import React, { Component } from "react";
-import ReactDom from "react-dom";
-import _ from "lodash";
-
-class App extends Component {
-  render() {
-    return (
-      <div>
-        <div>{_.join(["This", "is", "App"], " ")}</div>
-      </div>
-    );
-  }
-}
-
-ReactDom.render(<App />, document.getElementById("root"));
-```
-
-我们引用了`react`和`react-dom`，以及`lodash`，下面我们来优化对第三方库的打包流程。
-
-### 优化第一步
-
-首先，创建一个`webpack.dll.js`文件，把第三方模块单独达到打包到一个dll文件夹下。
-```js
-// webpack.dll.js
-const path = require('path');
-
-module.exports = {
-	mode: 'production',
-	entry: {
-		vendors: ['lodash','react', 'react-dom'],
-	},
-	output: {
-    // 命名、将vendors模块中的模块都打包为一个vendors.dll.js文件
-    filename: '[name].dll.js',
-    // 打包到dll文件夹下
-    path: path.resolve(__dirname, '../dll'),
-    // 暴露到全局变量中，
-		library: '[name]'
-	}
-}
-```
-新增一条script打包命令：
-```bash
-"build:dll": "webpack --config ./build/webpack.dll.js"
-```
-
-我们做到了把第三方模块抽离出来打包到dll文件夹中，并且集合为一个`vendors.dll.js`，然后我们需要在生成的html文件引用`vendors.dll.js`文件。这需要借助插件`add-asset-html-webpack-plugin`。
-
-[add-asset-html-webpack-plugin](https://www.npmjs.com/package/add-asset-html-webpack-plugin) :Add a JavaScript or CSS asset to the HTML generated by `html-webpack-plugin`
-
-这个插件可以往生成的HTML文件上添加新的静态资源。然后我们来添加这个插件的配置：
-```js
-// webpack.common.js
-module.exports = {
-...
-  plugins: [
-    new HtmlWebpackPlugin({
-      template: "src/index.html"
-    }),
-    new CleanWebpackPlugin(["dist"], {
-      root: path.resolve(__dirname, "../")
-    }),
-    new AddAssetHtmlWebpackPlugin({
-      filepath: path.resolve(__dirname, "../dll/vendors.dll.js")
-    })
-  ],
-...
-}
-```
-
-`npm run build`打包，看生成的HTML文件：
-![2](./images/2.png)
-
-这样就可以在`HtmlWebpackPlugin`生成的HTML文件基础上，通过`AddAssetHtmlWebpackPlugin`重新追加将`vendors.dll.js`也引入HTML文件中。
-
-但是也能看到，这个文件中不仅是引入了我们打包好的dll文件，还引用了原先在`node_modules`中的第三方模块生成的vendors，接下来就是要继续配置，使得我们在import`react-dom`、`react`、`lodash`时，直接去使用我们打包好的`vendors.dll.js`文件，而不是还去`node_modules`引用。
-
-### 优化第二步
-
-下面我们来进行dll文件的配置，添加`webpack.DllPlugin`：
-```js
-// webpack.dll.js
-const path = require('path');
-const webpack = require('webpack');
-
-module.exports = {
-...
-	plugins: [
-    // 添加映射条件
-		new webpack.DllPlugin({
-      // 要分析的模块的名字，也就是我们在library里配置暴露在全局中的变量名
-      name: '[name]',
-      // 分析出来的manifest.json映射文件的存放位置
-			path: path.resolve(__dirname, '../dll/[name].manifest.json'),
-		})
-	]
-}
-```
-
-分析出来json文件后，要在打包配置中添加`webpack.DllReferencePlugin`，导入这个json文件来分析第三方模块的对应关系。
+就和平时多个 Loader 一样叠加即可。
 
 ```js
-// webpack.common.js
-module.exports = {
-...
-  plugins: [
-    new HtmlWebpackPlugin({
-      template: "src/index.html"
-    }),
-    new CleanWebpackPlugin(["dist"], {
-      root: path.resolve(__dirname, "../")
-    }),
-    new AddAssetHtmlWebpackPlugin({
-      filepath: path.resolve(__dirname, "../dll/vendors.dll.js")
-    }),
-    new webpack.DllReferencePlugin({
-      manifest: path.resolve(__dirname, '../dll/vendors.manifest.json')
-    })
-  ],
-...
-}
-```
-
-现在打包出来的结构目录如下：
-![3](./images/3.png)
-
-并且我们可以看到这时候只会引入在dll文件夹下的dll文件了。
-![4](./images/4.png)
-
-### 优化第三步
-
-但这种写法不够灵活，要一个一个手动导入文件。
-
-
-## 多入口多页面打包配置
-实现配置多入口js文件，输出多个出口html文件，并且分别将入口文件打包到对应的出口文件中。
-```js
-module.exports = {
-  entry: {
-    main: "./src/index.js",
-    list: "./src/list.js",
-  },
-}
-```
-
-输出多个html文件，无非就是使用多个`new HtmlWebpackPlugin()`生成对应的html文件。
-
-```js
-plugins:[
-  new HtmlWebpackPlugin({
-    template: "src/index.html",
-    filename: "main.html",
-    chunks: ["runtime", "vendors", "main"]
-  }),
-    new HtmlWebpackPlugin({
-    template: "src/index.html",
-    filename: "list.html",
-    chunks: ["runtime", "vendors", "list"]
-  })
-]
-```
-
-```js
-// webpack.common.js
+// /webpack.config.js
 const path = require("path");
-const fs = require("fs");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const CleanWebpackPlugin = require("clean-webpack-plugin");
-const AddAssetHtmlWebpackPlugin = require("add-asset-html-webpack-plugin");
-const webpack = require("webpack");
-
-const makePlugins = configs => {
-  const plugins = [
-    new CleanWebpackPlugin(["dist"], {
-      root: path.resolve(__dirname, "../")
-    })
-  ];
-  Object.keys(configs.entry).forEach(item => {
-    plugins.push(
-      new HtmlWebpackPlugin({
-        template: "src/index.html",
-        filename: `${item}.html`,
-        chunks: ["runtime", "vendors", item]
-      })
-    );
-  });
-  // 遍历dll文件夹下的所有文件，files是一个数组，里面存放文件名们。
-  const files = fs.readdirSync(path.resolve(__dirname, "../dll"));
-  files.forEach(file => {
-    if (/.*\.dll.js/.test(file)) {
-      plugins.push(
-        // 往对应的Html上添加新的js文件
-        new AddAssetHtmlWebpackPlugin({
-          filepath: path.resolve(__dirname, "../dll", file)
-        })
-      );
-    }
-    if (/.*\.manifest.json/.test(file)) {
-      plugins.push(
-        new webpack.DllReferencePlugin({
-          manifest: path.resolve(__dirname, "../dll", file)
-        })
-      );
-    }
-  });
-  return plugins;
-};
-
-const configs = {
-  entry: {
-    index: "./src/index.js",
-    list: "./src/list.js",
-    detail: "./src/detail.js"
+module.exports = {
+...
+  module: {
+    rules: [
+      {
+        test: /\.js/,
+        use: [
+          {
+            loader: path.resolve(__dirname, "./loaders/replaceLoader.js"),
+          },
+          {
+            loader: path.resolve(__dirname, "./loaders/replaceLoader-2.js"),
+            options: {
+              name: "Du"
+            }
+          }
+        ]
+      }
+    ]
   },
-  resolve: {
-    extensions: [".js", ".jsx"]
+...
+};
+```
+
+通过`resolveLoader`，优化`loader`的引用路径。
+
+```js
+// /webpack.config.js
+const path = require("path");
+module.exports = {
+...
+  resolveLoader: {
+    modules: ["node_modules", "./loaders"]
   },
   module: {
     rules: [
       {
-        test: /\.jsx?$/,
-        include: path.resolve(__dirname, "../src"),
+        test: /\.js/,
         use: [
           {
-            loader: "babel-loader"
+            loader: "replaceLoader"
+          },
+          {
+            loader: "replaceLoaderAsync",
+            options: {
+              name: "lee"
+            }
           }
         ]
-      },
-      {
-        test: /\.(jpg|png|gif)$/,
-        use: {
-          loader: "url-loader",
-          options: {
-            name: "[name]_[hash].[ext]",
-            outputPath: "images/",
-            limit: 10240
-          }
-        }
-      },
-      {
-        test: /\.(eot|ttf|svg)$/,
-        use: {
-          loader: "file-loader"
-        }
       }
     ]
   },
-  optimization: {
-    runtimeChunk: {
-      name: "runtime"
-    },
-    usedExports: true,
-    splitChunks: {
-      chunks: "all",
-      cacheGroups: {
-        vendors: {
-          test: /[\\/]node_modules[\\/]/,
-          priority: -10,
-          name: "vendors"
-        }
-      }
-    }
-  },
-  performance: false,
-  output: {
-    path: path.resolve(__dirname, "../dist")
-  }
+...
 };
-
-configs.plugins = makePlugins(configs);
-
-module.exports = configs;
 ```
 
-```js
-// webpack.dev.js
-const webpack = require("webpack");
-const merge = require("webpack-merge");
-const commonConfig = require("./webpack.common.js");
+## 编写一个 Plugin
 
-const devConfig = {
+Plugin 和 Loader 的区别个人理解：Loader 用来处理类似于 js/css/font/svg/img 等等等文件，而 Plugin 是在打包的某一个时刻（打包前、打包时、打包后）来额外做某些事情。
+
+webpack Plugin 设计模式：发布订阅，事件驱动模式。
+
+我们下面编写的这个 Plugin 要做的事情：**打包结束后在 dist 目录添加一个版权信息的 txt 文件。**
+
+插件的本质是一个 Class。
+
+第一步，声明一个插件文件：
+
+```js
+// /plugins/copyright-webpack-plugin.js
+class CopyrightWebpackPlugin {
+  // 使用插件的时候，会去调用apply方法，其中的compiler是webpack的实例对象。
+  apply(compiler) {
+    // compiler.hooks.compile.tap('CopyrightWebpackPlugin', (compilation) => {
+    // 	console.log('compiler');
+    // })
+    // compiler.hooks.emit.tapAsync('CopyrightWebpackPlugin', (compilation, cb) => {
+    // 	debugger;
+    // 	compilation.assets['copyright.txt']= {
+    // 		source: function() {
+    // 			return 'copyright by dell lee'
+    // 		},
+    // 		size: function() {
+    // 			return 21;
+    // 		}
+    // 	};
+    // 	cb();
+    // })
+  }
+}
+module.exports = CopyrightWebpackPlugin;
+```
+
+第二步，在`webpack.config.js`中使用它：
+
+```js
+// /webpack.config.js
+const path = require("path");
+const CopyRightWebpackPlugin = require("./plugins/copyright-webpack-plugin");
+module.exports = {
   mode: "development",
-  devtool: "cheap-module-eval-source-map",
-  devServer: {
-    contentBase: "./dist",
-    open: true,
-    port: 8080,
-    hot: true
+  entry: {
+    main: "./src/index.js"
   },
-  module: {
-    rules: [
-      {
-        test: /\.scss$/,
-        use: [
-          "style-loader",
-          {
-            loader: "css-loader",
-            options: {
-              importLoaders: 2
-            }
-          },
-          "sass-loader",
-          "postcss-loader"
-        ]
-      },
-      {
-        test: /\.css$/,
-        use: ["style-loader", "css-loader", "postcss-loader"]
-      }
-    ]
-  },
-  plugins: [new webpack.HotModuleReplacementPlugin()],
+  plugins: [new CopyRightWebpackPlugin()],
   output: {
-    filename: "[name].js",
-    chunkFilename: "[name].js"
+    path: path.resolve(__dirname, "dist"),
+    filename: "[name].js"
   }
 };
+```
 
-module.exports = merge(commonConfig, devConfig);
+这一下明白了为什么在使用 Plugins 时，总是要 new 一个实例，因为 Plugin 导出的就是一个 Class。
+
+想接收参数，那就在`constructor`中接收`options`来使用：
+
+```js
+module.exports = {
+	...
+	plugins: [
+		new CopyRightWebpackPlugin({
+			name: 'du'
+		})
+	],
+	...
+}
 ```
 
 ```js
-// webpack.prod.js
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
-const merge = require("webpack-merge");
-const commonConfig = require("./webpack.common.js");
-
-const prodConfig = {
-  mode: "production",
-  devtool: "cheap-module-source-map",
-  module: {
-    rules: [
-      {
-        test: /\.scss$/,
-        use: [
-          MiniCssExtractPlugin.loader,
-          {
-            loader: "css-loader",
-            options: {
-              importLoaders: 2
-            }
-          },
-          "sass-loader",
-          "postcss-loader"
-        ]
-      },
-      {
-        test: /\.css$/,
-        use: [MiniCssExtractPlugin.loader, "css-loader", "postcss-loader"]
-      }
-    ]
-  },
-  optimization: {
-    minimizer: [new OptimizeCSSAssetsPlugin({})]
-  },
-  plugins: [
-    new MiniCssExtractPlugin({
-      filename: "[name].css",
-      chunkFilename: "[name].chunk.css"
-    })
-  ],
-  output: {
-    filename: "[name].[contenthash].js",
-    chunkFilename: "[name].[contenthash].js"
+// /plugins/copyright-webpack-plugin.js
+class CopyrightWebpackPlugin {
+  constructor(options) {
+    console.log(options); // {name:'du'}
   }
-};
-
-module.exports = merge(commonConfig, prodConfig);
+  apply(compiler) {
+    // do something
+  }
+}
+module.exports = CopyrightWebpackPlugin;
 ```
+
+钩子执行的时刻说明：[compiler-hooks](https://webpack.js.org/api/compiler-hooks)
+
+例如`emit`：Executed right before emitting assets to output dir.(打包好准备把文件放到输出目录的时刻)
+它是一个 AsyncSeriesHook（异步钩子），所以要使用`tapAsync`。
+
+`compilation`里存储着这次打包的所有内容。可以打印输出`compilation.assets`，是一个对象。
+
+```js
+class CopyrightWebpackPlugin {
+  apply(compiler) {
+		// 同步的时刻
+    compiler.hooks.compile.tap("CopyrightWebpackPlugin", compilation => {
+      console.log("compiler");
+		});
+
+		// 异步的时刻
+    compiler.hooks.emit.tapAsync(
+      "CopyrightWebpackPlugin",
+      (compilation, cb) => {
+				// 在compilation中新增一个txt文件
+        compilation.assets["copyright.txt"] = {
+					// 文件的内容
+          source: function() {
+            return "copyright by dell lee";
+					},
+					// 这个文件的大小长度是21个字节
+          size: function() {
+            return 21;
+          }
+				};
+				// 用了异步的tapAsync，最后一定要执行一下cb()
+        cb();
+      }
+    );
+  }
+}
+module.exports = CopyrightWebpackPlugin;
+```
+
+这样就完成了我们要往打包文件中添加一个txt文件的需求。
+
+## 编写一个 Bundle

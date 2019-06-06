@@ -37,8 +37,66 @@ module.exports = {
         children: ["/"]
       },
       {
+        title: "JavaScripts专栏",
+        collapsable: true,
+        children: [
+          "/javascript/this_in_js.md",
+          "/javascript/about_js_this.md",
+          "/javascript/closure.md",
+          "/javascript/inheritance.md",
+          "/javascript/prototypes_and_prototype_chains.md",
+          "/javascript/inheritance_and_prototype_chain_1.md",
+          "/javascript/inheritance_and_prototype_chain_2.md",
+          "/javascript/event_loop.md",
+          "/javascript/promise.md",
+          "/javascript/asynchronous_function.md",
+          "/javascript/es6_classes.md",
+          "/javascript/iife.md"
+        ]
+      },
+      {
+        title: "React 专栏",
+        collapsable: true,
+        children: [
+          "/react/react_basic.md",
+          "/react/redux_basic.md",
+          "/react/redux_intermediate.md",
+          "/react/libs_with_react.md",
+          "/react/react_ssr.md",
+          "/react/redux_createstore.md",
+          "/react/react_context.md"
+        ]
+      },
+      {
+        title: "Vue 专栏",
+        collapsable: true,
+        children: ["/vue/IIS.md"]
+      },
+      {
+        title: "Webpack 专栏",
+        collapsable: true,
+        children: [
+          "/webpack/webpack_basic.md",
+          "/webpack/webpack_intermediate.md",
+          "/webpack/webpack_advanced.md"
+        ]
+      },
+      {
+        title: "TypeScript 专栏",
+        collapsable: true,
+        children: [
+          "/typescript/basic_usage.md",
+          "/typescript/intermediate_usage.md"
+        ]
+      },
+      {
+        title: "性能优化",
+        collapsable: true,
+        children: ["/performance/cache.md"]
+      },
+      {
         title: "Interview 专栏",
-        collapsable: false,
+        collapsable: true,
         children: [
           "/interview/2018_basic.md",
           "/interview/js_question.md",
@@ -47,68 +105,10 @@ module.exports = {
         ]
       },
       {
-        title: "JavaScript 专栏",
-        collapsable: false,
-        children: [
-          "/javascript/this_in_js",
-          "/javascript/about_js_this",
-          "/javascript/closure",
-          "/javascript/inheritance",
-          "/javascript/prototypes_and_prototype_chains",
-          "/javascript/inheritance_and_prototype_chain_1",
-          "/javascript/inheritance_and_prototype_chain_2",
-          "/javascript/event_loop",
-          "/javascript/promise",
-          "/javascript/asynchronous_function",
-          "/javascript/es6_classes",
-          "/javascript/iife"
-        ]
-      },
-      {
-        title: "React 专栏",
-        collapsable: false,
-        children: [
-          "/react/react_basic",
-          "/react/redux_basic",
-          "/react/redux_intermediate",
-          "/react/libs_with_react",
-          "/react/react_ssr",
-          "/react/redux_createstore",
-          "/react/react_context"
-        ]
-      },
-      {
-        title: "Vue 专栏",
-        collapsable: false,
-        children: ["/vue/IIS"]
-      },
-      {
-        title: "Webpack 专栏",
-        collapsable: false,
-        children: [
-          "/webpack/webpack_basic.md",
-          "/webpack/webpack_advanced.md",
-        ]
-      },
-      {
-        title: "TypeScript 专栏",
-        collapsable: false,
-        children: [
-          "/typescript/basic_usage.md",
-          "/typescript/advanced_usage.md"
-        ]
-      },
-      {
-        title: "性能优化",
-        collapsable: false,
-        children: [
-          "/performance/cache.md",
-       ]
-      },
-      {
         title: "其他",
-        collapsable: false,
+        collapsable: true,
         children: [
+          "/other/regular_expression.md",
           "/other/yarn_npm_resource_change.md",
           "/other/common_commands.md"
         ]
