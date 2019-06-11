@@ -290,27 +290,27 @@ module.exports = CopyrightWebpackPlugin;
 ```js
 class CopyrightWebpackPlugin {
   apply(compiler) {
-		// 同步的时刻
+    // 同步的时刻
     compiler.hooks.compile.tap("CopyrightWebpackPlugin", compilation => {
       console.log("compiler");
-		});
+    });
 
-		// 异步的时刻
+    // 异步的时刻
     compiler.hooks.emit.tapAsync(
       "CopyrightWebpackPlugin",
       (compilation, cb) => {
-				// 在compilation中新增一个txt文件
+        // 在compilation中新增一个txt文件
         compilation.assets["copyright.txt"] = {
-					// 文件的内容
+          // 文件的内容
           source: function() {
             return "copyright by dell lee";
-					},
-					// 这个文件的大小长度是21个字节
+          },
+          // 这个文件的大小长度是21个字节
           size: function() {
             return 21;
           }
-				};
-				// 用了异步的tapAsync，最后一定要执行一下cb()
+        };
+        // 用了异步的tapAsync，最后一定要执行一下cb()
         cb();
       }
     );
@@ -319,6 +319,382 @@ class CopyrightWebpackPlugin {
 module.exports = CopyrightWebpackPlugin;
 ```
 
-这样就完成了我们要往打包文件中添加一个txt文件的需求。
+这样就完成了我们要往打包文件中添加一个 txt 文件的需求。
 
-## 编写一个 Bundle
+## 编写一个 Bundler
+
+下面我们来自己实现一个简易的打包工具(Bundler)
+
+### 模块分析-初始化
+
+首先是项目的目录结构创建。
+
+```bash
+npm init -y
+```
+
+在`src`下创建三个文件：
+
+```js
+// /src/word.js
+export const word = "hello";
+```
+
+```js
+// /src/message.js
+import { word } from "./word.js";
+const message = `say ${word}`;
+export default message;
+```
+
+```js
+// /src/index.js
+import message from "./message.js";
+console.log(message);
+```
+
+然后再创建打包配置文件`bundler.js`，在这里我们使用`fs`模块来读取入口文件的内容。
+
+```js
+// /src/bundler.js
+const fs = require("fs");
+const moduleAnalyser = filename => {
+  const content = fs.readFileSync(filename, "utf-8");
+  console.log(content);
+};
+moduleAnalyser("./src/index.js");
+```
+
+想要控制台输出代码高亮的话，可以使用`cli-highlight`
+
+```bash
+npm i cli-highlight -g
+```
+
+运行我们的代码，代码高亮打印输出`content`：
+
+```bash
+node bundler.js | highlight
+```
+
+![bundler_1](./images/bundler_1.png)
+
+`content`就是我们引入的`'./src/index.js'`的内容。
+
+### 模块分析-多入口文件依赖
+
+上面只引入了一个模块，能比较方便的获取文件的内容，假如入口文件引入了很多模块，那怎么获取到这些文件的所有依赖？
+
+我们可以安装使用`babel`的[@babel-parser](https://babeljs.io/docs/en/babel-parser)，这个会把 JS 文件解析为抽象语法树，然后我们再进行分析。
+
+```js
+// /src/bundler.js
+const fs = require("fs");
+const parser = require("@babel/parser");
+
+const moduleAnalyser = filename => {
+  const content = fs.readFileSync(filename, "utf-8");
+  console.log(
+    parser.parse(content, {
+      // ES6模式sourceType用module
+      sourceType: "module"
+    })
+  );
+};
+moduleAnalyser("./src/index.js");
+```
+
+![bundler_2](./images/bundler_2.png)
+我们可以看到`babel-parser`把`content`内容解析成了抽象语法树，我们继续对这个抽象语法树的节点进行展开，打印`ast.program.body`：
+
+```js
+const ast = parser.parse(content, {
+  sourceType: "module"
+});
+console.log(ast.program.body);
+```
+
+![bundler_3](./images/bundler_3.png)
+
+假如我们多引入一个模块，那输出的内容中会多出一个`type: 'ImportDeclaration'`的 Node 节点。例如我们多引入一个 message1：
+
+```js
+// /src/index.js
+import message from "./message.js";
+import message1 from "./message1.js";
+
+console.log(message);
+```
+
+那`ast.program.body`输出的内容就变成：
+
+![bundler_4](./images/bundler_4.png)
+
+可以看到，多出了一个`type: 'ImportDeclaration`的节点。
+
+遍历每个引入节点有些麻烦，babel 提供了插件[babel-traverse](https://babeljs.io/docs/en/babel-traverse)来做这件事。
+
+安装`npm install --save @babel/traverse`，然后配合着`parse`一块解析模块：
+
+```js
+// /src/bundler.js
+const fs = require("fs");
+const path = require("path");
+const parser = require("@babel/parser");
+// ES6默认导出的export default，所以这里要加 .default
+const traverse = require("@babel/traverse").default;
+
+const moduleAnalyser = filename => {
+  const content = fs.readFileSync(filename, "utf-8");
+  const ast = parser.parse(content, {
+    sourceType: "module"
+  });
+  // 声明一个依赖数组
+  const dependencies = [];
+  // traverse接收第一个参数是抽象语法树对象
+  traverse(ast, {
+    // 筛选出ImportDeclaration类型的节点，然后遍历
+    ImportDeclaration({ node }) {
+      // dirname 是 filename 的路径地址
+      const dirname = path.dirname(filename); // dirname: ./src
+      // 拼接路径
+      // node.source.value就是文件名的值，可以看上面打印输出的内容来取值
+      const newFile = "./" + path.join(dirname, node.source.value);
+      dependencies.push(newFile);
+    }
+  });
+  console.log("dependencies:", dependencies);
+};
+moduleAnalyser("./src/index.js");
+```
+
+打印出来的 dependencies 是`dependencies: [ './src/message.js', './src/message1.js' ]`。
+
+但是这样的`dependencies`还不够灵活，因为数组中只有文件的绝对路径，我们来进行改进，让`dependencies`中，保存文件的相对路径和绝对路径。
+
+```js
+// /src/bundler.js
+...
+	const dependencies = {};
+  traverse(ast, {
+    ImportDeclaration({node}) {
+	  const dirname = path.dirname(filename);
+      const newFile = "./" + path.join(dirname, node.source.value);
+      // -- dependencies.push(newFile);
+      // 以对象的形式存放
+			++ dependencies[node.source.value] = newFile;
+    }
+  });
+  console.log(dependencies);
+  ...
+```
+
+输出的`dependencies`，键是相对路径，值是绝对路径：
+![bundler_5](./images/bundler_5.png)
+
+### 模块分析-编译入口文件代码
+
+截止目前，我们已经获取了入口文件的所有的依赖，但是这还不够，我们还需要将原始的代码，打包成可以在浏览器上可运行的编译后的代码。
+
+我们借助[@babel/core](https://babeljs.io/docs/en/babel-core)来做这个转化，babel 提供了`transformFromAst`方法，这个方法可以把抽象语法树(ast)转化为浏览器可执行的代码。
+
+安装`@babel/core`，以及`@babel/preset-env`，babel 需要借助`@babel/preset-env`来进行编译转化。
+
+```bash
+npm i @babel/core @babel/preset-env --save
+```
+
+```js
+// /src/bundler.js
+const babel = require('@babel/core');
+...
+	const dependencies = {};
+  traverse(ast, {
+    ImportDeclaration({node}) {
+	  const dirname = path.dirname(filename);
+      const newFile = "./" + path.join(dirname, node.source.value);
+			dependencies[node.source.value] = newFile;
+    }
+  });
+  // AST转化为可执行代码
+  const { code } = babel.transformFromAst(ast, null, {
+		presets: ["@babel/preset-env"]
+	});
+  console.log(code);
+  ...
+```
+
+`babel.transformFromAst`返回的对象中有个`code`对象，这个对象就是编译好后的文件内容，我们打印它出来看看：
+![bundler_6](./images/bundler_6.png)
+
+可以看到这就是编译后的 ES5 的代码了，那我们模块分析这块的内容就完成了，我们完成了对入口文件的分析，下面是完整的`/src/bundler.js`文件：
+
+```js
+// /src/bundler.js
+const fs = require("fs");
+const path = require("path");
+const parser = require("@babel/parser");
+const traverse = require("@babel/traverse").default;
+const babel = require("@babel/core");
+
+const moduleAnalyser = filename => {
+  const content = fs.readFileSync(filename, "utf-8");
+  const ast = parser.parse(content, {
+    sourceType: "module"
+  });
+  const dependencies = {};
+  traverse(ast, {
+    ImportDeclaration({ node }) {
+      const dirname = path.dirname(filename);
+      const newFile = "./" + path.join(dirname, node.source.value);
+      dependencies[node.source.value] = newFile;
+    }
+  });
+  const { code } = babel.transformFromAst(ast, null, {
+    presets: ["@babel/preset-env"]
+  });
+  return {
+    filename,
+    dependencies,
+    code
+  };
+};
+const moduleInfo = moduleAnalyser("./src/index.js");
+console.log(moduleInfo);
+```
+
+打印`moduleInfo`，导出的对象里的三个值：
+![bundler_7](./images/bundler_7.png)
+
+### Dependencies Graph
+
+我们上面只分析了入口文件，只是最外面的一层，但入口文件中引入的文件还没有分析，下面我们要进行这一步，递归地分析入口文件中的引用，为之后代码的生成做准备。
+
+在之前的代码基础上，我们去掉在`index.js`中对`message1.js`的引用，`index.js`引用`message.js`，`message.js`内再引用`word.js`.
+
+通过队列的方式来实现一个递归的效果，我们实现一个`makeDependenciesGraph`函数：
+
+```js
+// /src/bundler.js
+// ...
+// 省略引入的模块
+const moduleAnalyser = filename => {
+  // ...
+  // 省略moduleAnalyser函数内容
+  return {
+    filename,
+    dependencies,
+    code
+  };
+};
+const makeDependenciesGraph = entry => {
+  const entryModule = moduleAnalyser(entry);
+  console.log("entryModule: ", entryModule);
+  const graphArray = [entryModule];
+  console.log("graphArray遍历前: ", graphArray);
+  // 对graphArray遍历
+  for (let i = 0; i < graphArray.length; i++) {
+    const item = graphArray[i];
+    // 取出对象中的依赖
+    const { dependencies } = item;
+    // 有存在依赖则再执行一次moduleAnalyser，并且push到graphArray中
+    // 假设是第一次执行，graphArray长度为1，
+    // 那push后，graphArray的长度为2，就会继续遍历graphArray中刚push进来的dependencies文件
+    if (dependencies) {
+      for (let j in dependencies) {
+        graphArray.push(moduleAnalyser(dependencies[j]));
+      }
+    }
+  }
+  console.log("graphArray遍历完后: ", graphArray);
+
+  // 创建一个graph对象，包装这个对象来做后续使用
+  const graph = {};
+  graphArray.forEach(item => {
+    graph[item.filename] = {
+      dependencies: item.dependencies,
+      code: item.code
+    };
+  });
+  return graph;
+};
+
+const graghInfo = makeDependenciesGraph("./src/index.js");
+console.log('包装后的graghInfo:', graghInfo);
+```
+
+下面我们来看输出，可以看到`entryModule`对象，就是`moduleAnalyser()`返回的结果：
+![bundler_8](./images/bundler_8.png)
+
+然后再看遍历前后`graphArray`的两次输出，第一次数组里只有一个对象，第二次数组里有三个对象：
+![bundler_9](./images/bundler_9.png)
+
+最后看看包装后的`graghInfo`（依赖树），也就是最终我们期待的对象，键是文件名称，值是`dependencies`和`code`：
+![bundler_10](./images/bundler_10.png)
+
+### 生成代码
+现在我们已经拿到对所有代码模块分析生成的结果（Dependencies Graph），就是上述的`graghInfo`对象。最后我们需要输出生成一份打包后的代码，使其可以直接在浏览器运行。
+
+为了避免污染全局环境，代码要使用IIFE中执行（闭包环境）。
+
+我们构造一个函数，使其输出最后我们所需的打包后的code：
+
+```js
+// /src/bundler.js
+// ... 省略上方
+const generateCode = (entry) => {
+  const graph = makeDependenciesGraph(entry);
+  return `
+  (function(graph){
+
+  })(${graph})
+  `
+}
+// -- const graghInfo = makeDependenciesGraph('./src/index.js');
+const code = generateCode('./src/index.js');
+console.log('code:', code);
+```
+
+输出code：
+```js
+code: 
+  (function(graph){
+
+  })([object Object])
+```
+
+这编译后的代码不对，因为上面的`${graph}`是个对象，所以我们需要先将这个对象stringify后再放入字符拼接中。
+```js
+const graph = JSON.stringify(makeDependenciesGraph(entry));
+return `
+(function(graph){
+
+})(${graph})
+`
+```
+再次输出code：
+![bundler_11](./images/bundler_11.png)
+
+看不清楚的话，这里有文字版：
+```js
+// code内容：
+(function(graph) {})({
+  "./src/index.js": {
+    dependencies: { "./message.js": "./src/message.js" },
+    code:
+      '"use strict";\n\nvar _message = _interopRequireDefault(require("./message.js"));\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }\n\nconsole.log(_message["default"]);'
+  },
+  "./src/message.js": {
+    dependencies: { "./word.js": "./src/word.js" },
+    code:
+      '"use strict";\n\nObject.defineProperty(exports, "__esModule", {\n  value: true\n});\nexports["default"] = void 0;\n\nvar _word = require("./word.js");\n\nvar message = "say ".concat(_word.word);\nvar _default = message;\nexports["default"] = _default;'
+  },
+  "./src/word.js": {
+    dependencies: {},
+    code:
+      '"use strict";\n\nObject.defineProperty(exports, "__esModule", {\n  value: true\n});\nexports.word = void 0;\nvar word = \'hello\';\nexports.word = word;'
+  }
+});
+```
+
+我们可以看到，如果直接把这些代码放到浏览器是运行不起来的，因为缺少`require()`函数和`exports`对象。下面我们来补充它们，
