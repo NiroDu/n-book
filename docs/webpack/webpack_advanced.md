@@ -1,5 +1,7 @@
 # webpack advanced 原理分析
 
+[toc]
+
 ## 编写一个 Loader
 
 Loader 的本质就只是一个函数，拿到源代码 source 对象，然后再返回处理后的 source 对象。
@@ -620,7 +622,7 @@ const makeDependenciesGraph = entry => {
 };
 
 const graghInfo = makeDependenciesGraph("./src/index.js");
-console.log('包装后的graghInfo:', graghInfo);
+console.log("包装后的graghInfo:", graghInfo);
 ```
 
 下面我们来看输出，可以看到`entryModule`对象，就是`moduleAnalyser()`返回的结果：
@@ -633,49 +635,56 @@ console.log('包装后的graghInfo:', graghInfo);
 ![bundler_10](./images/bundler_10.png)
 
 ### 生成代码
-现在我们已经拿到对所有代码模块分析生成的结果（Dependencies Graph），就是上述的`graghInfo`对象。最后我们需要输出生成一份打包后的代码，使其可以直接在浏览器运行。
 
-为了避免污染全局环境，代码要使用IIFE中执行（闭包环境）。
+现在我们已经拿到对所有代码模块分析生成的结果（Dependencies Graph 依赖图谱），就是上述的`graghInfo`对象。最后我们需要输出生成一份打包后的代码，使其可以直接在浏览器运行。
 
-我们构造一个函数，使其输出最后我们所需的打包后的code：
+为了避免污染全局环境，代码要使用 IIFE 中执行（闭包环境）。
+
+我们构造一个函数，使其输出最后我们所需的打包后的 code：
 
 ```js
 // /src/bundler.js
 // ... 省略上方
-const generateCode = (entry) => {
+const generateCode = entry => {
   const graph = makeDependenciesGraph(entry);
   return `
   (function(graph){
 
   })(${graph})
-  `
-}
+  `;
+};
 // -- const graghInfo = makeDependenciesGraph('./src/index.js');
-const code = generateCode('./src/index.js');
-console.log('code:', code);
+const code = generateCode("./src/index.js");
+console.log("code:", code);
 ```
 
-输出code：
+输出 code：
+
 ```js
-code: 
+code:
   (function(graph){
 
   })([object Object])
 ```
 
-这编译后的代码不对，因为上面的`${graph}`是个对象，所以我们需要先将这个对象stringify后再放入字符拼接中。
-```js
-const graph = JSON.stringify(makeDependenciesGraph(entry));
-return `
-(function(graph){
+这编译后的代码不对，因为上面的`${graph}`是个对象，所以我们需要先将这个对象 stringify 后再放入字符拼接中。
 
-})(${graph})
-`
+```js
+const generateCode = entry => {
+  const graph = JSON.stringify(makeDependenciesGraph(entry));
+  return `
+  (function(graph){
+
+  })(${graph})
+  `;
+};
 ```
-再次输出code：
+
+再次输出 code：
 ![bundler_11](./images/bundler_11.png)
 
 看不清楚的话，这里有文字版：
+
 ```js
 // code内容：
 (function(graph) {})({
@@ -697,4 +706,187 @@ return `
 });
 ```
 
-我们可以看到，如果直接把这些代码放到浏览器是运行不起来的，因为缺少`require()`函数和`exports`对象。下面我们来补充它们，
+我们可以看到，如果直接把这些代码放到浏览器是运行不起来的，因为在浏览器中缺少`require()`函数和`exports`对象。如果我们直接去执行会报错，下面我们来补充它们。
+
+首先是构造`require()`函数：
+
+```js
+const generateCode = entry => {
+  const graph = JSON.stringify(makeDependenciesGraph(entry));
+  return `
+  (function(graph){
+    function require(module) {
+      (function(code){
+        eval(code);
+      })(graph[module].code)
+    };
+    require('${entry}')
+  })(${graph})
+  `;
+};
+const code = generateCode("./src/index.js");
+```
+
+但是上面的 require 函数还是有一些问题，eval() 函数会将传入的字符串当做 JavaScript 代码进行执行，我们把`eval(code)`中的`code`单独拿出来看看，也就是`graph[module].code`的内容，有三个，我们看`"./src/index.js"`的，并把这个字符串先手动转为JS高亮看：
+
+```js
+// "./src/index.js"
+"use strict";\n\n
+// 注意这里有一个require()
+var _message = _interopRequireDefault(require("./message.js"));\n\n
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }\n\n
+console.log(_message["default"]);
+```
+
+其中还有一个`require("./message.js")`函数，那再调用`_interopRequireDefault`方式时，它会再次调用`eval()`函数外层的`require()`方法，递归执行，也就是第二次执行的是：
+```js
+...
+  // 第二次执行：require("./message.js")
+  function require(module) {
+    (function(code){
+      eval(code);
+    })(graph[module].code)
+  };
+...
+```
+
+而传入的参数`./message.js`是不对的，它会在`graph[module].code`中去寻找，即`graph['./message.js'].code`，这当然是找不到的，应该是`./src/message.js`才对。
+
+所以我们需要对`./message.js`这样的相对路径做转换，我们再顶一个`localRequire()`函数，用于返回正确的路径。
+```js
+...
+  // 第二次执行：require("./message.js")
+  function require(module) {
+    function localRequire(relativePath) {
+      // 接收到的relativePath 是 "./message.js"
+      // 返回require()函数的运行结果是 "./src/message.js"
+      return require(graph[module].dependencies[relativePath])
+    }
+    (function(require, code){
+      // 这样code里的require()其实就是localRequire中返回的require()，重新声明的
+      eval(code);
+    })(localRequire, graph[module].code)
+  };
+...
+```
+
+最后`Object.defineProperty(exports, 'property', {xx:xx})`，我们再定义一个`exports`空对象传入其中，生成代码便完成了。
+
+```js
+const generateCode = (entry) => {
+  const graph = JSON.stringify(makeDependenciesGraph(entry));
+  return `
+  (function(graph){
+    function require(module) { 
+      function localRequire(relativePath) {
+        return require(graph[module].dependencies[relativePath]);
+      }
+      var exports = {};
+      (function(require, exports, code){
+        eval(code)
+      })(localRequire, exports, graph[module].code);
+      return exports;
+    };
+    require('${entry}')
+  })(${graph});
+  `
+}
+const code = generateCode("./src/index.js");
+```
+
+我们打包后的代码可以直接拿到浏览器运行。
+![bundler_12](./images/bundler_12.png)
+
+打包出来的内容：
+```js
+  (function(graph){
+    function require(module) { 
+      function localRequire(relativePath) {
+        return require(graph[module].dependencies[relativePath]);
+      }
+      var exports = {};
+      (function(require, exports, code){
+        eval(code)
+      })(localRequire, exports, graph[module].code);
+      return exports;
+    };
+    require('./src/index.js')
+  })({"./src/index.js":{"dependencies":{"./message.js":"./src/message.js"},"code":"\"use strict\";\n\nvar _message = _interopRequireDefault(require(\"./message.js\"));\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { \"default\": obj }; }\n\nconsole.log(_message[\"default\"]);"},"./src/message.js":{"dependencies":{"./word.js":"./src/word.js"},"code":"\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports[\"default\"] = void 0;\n\nvar _word = require(\"./word.js\");\n\nvar message = \"say \".concat(_word.word);\nvar _default = message;\nexports[\"default\"] = _default;"},"./src/word.js":{"dependencies":{},"code":"\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.word = void 0;\nvar word = 'hello';\nexports.word = word;"}});
+```
+
+完整的配置文件：
+```js
+// /src/bundler.js
+const fs = require("fs");
+const path = require("path");
+const parser = require("@babel/parser");
+const traverse = require("@babel/traverse").default;
+const babel = require("@babel/core");
+
+const moduleAnalyser = filename => {
+  const content = fs.readFileSync(filename, "utf-8");
+  const ast = parser.parse(content, {
+    sourceType: "module"
+  });
+  const dependencies = {};
+  traverse(ast, {
+    ImportDeclaration({ node }) {
+      const dirname = path.dirname(filename);
+      const newFile = "./" + path.join(dirname, node.source.value);
+      dependencies[node.source.value] = newFile;
+    }
+  });
+  const { code } = babel.transformFromAst(ast, null, {
+    presets: ["@babel/preset-env"]
+  });
+  return {
+    filename,
+    dependencies,
+    code
+  };
+};
+
+const makeDependenciesGraph = (entry) => {
+  const entryModule = moduleAnalyser(entry);
+  const graphArray = [ entryModule ];
+	for(let i = 0; i < graphArray.length; i++) {
+		const item = graphArray[i];
+		const { dependencies } = item;
+		if(dependencies) {
+			for(let j in dependencies) {
+				graphArray.push(
+					moduleAnalyser(dependencies[j])
+				);
+			}
+    }
+  }
+  const graph = {};
+  graphArray.forEach(item => {
+		graph[item.filename] = {
+			dependencies: item.dependencies,
+			code: item.code
+		}
+	});
+  return graph;
+}
+const generateCode = (entry) => {
+  const graph = JSON.stringify(makeDependenciesGraph(entry));
+  return `
+  (function(graph){
+    function require(module) { 
+      function localRequire(relativePath) {
+        return require(graph[module].dependencies[relativePath]);
+      }
+      var exports = {};
+      (function(require, exports, code){
+        eval(code)
+      })(localRequire, exports, graph[module].code);
+      return exports;
+    };
+    require('${entry}')
+  })(${graph});
+  `
+}
+const code = generateCode('./src/index.js');
+```
+
