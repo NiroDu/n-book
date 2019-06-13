@@ -46,10 +46,32 @@ module.exports = {
     sidebar: {
       '/typescript/': [
         {
+          title: '初识 TypeScript',
+          collapsable: false,
+          children: [
+            ['/typescript/chapter1/', 'Introduction'],
+            '/typescript/chapter1/install',
+            '/typescript/chapter1/start'
+          ]
+        },
+        {
+          title: 'TypeScript 常用语法',
+          collapsable: false,
+          children: [
+            '/typescript/chapter2/type',
+            '/typescript/chapter2/declare',
+            '/typescript/chapter2/interface',
+            '/typescript/chapter2/class',
+            '/typescript/chapter2/function',
+            '/typescript/chapter2/generic',
+            '/typescript/chapter2/inference',
+            '/typescript/chapter2/advance'
+          ]
+        },
+        {
           title: "TS",
           collapsable: false,
           children: [
-            "/typescript/basic_intro.md",
             "/typescript/basic_usage.md",
             "/typescript/intermediate_usage.md",
             "/typescript/tips.md"

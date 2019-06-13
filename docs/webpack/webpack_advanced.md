@@ -1,7 +1,5 @@
 # webpack advanced 原理分析
 
-[toc]
-
 ## 编写一个 Loader
 
 Loader 的本质就只是一个函数，拿到源代码 source 对象，然后再返回处理后的 source 对象。
