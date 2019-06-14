@@ -124,6 +124,29 @@ let colorName: string = Color[2]
 console.log(colorName)  // 显示'Green'因为上面代码里它的值是2
 ```
 
+源代码：
+```typescript
+enum Color {
+  Red = 1,
+  Green = 2,
+  Blue = 5
+}
+let colorName: string = Color[2];
+console.log(colorName);
+```
+
+编译后：
+```js
+var Color;
+(function(Color) {
+  Color[(Color["Red"] = 1)] = "Red";
+  Color[(Color["Green"] = 2)] = "Green";
+  Color[(Color["Blue"] = 5)] = "Blue";
+})(Color || (Color = {}));
+var colorName = Color[2];
+console.log(colorName);
+```
+
 ## any
 
 有时候，我们会想要为那些在编程阶段还不清楚类型的变量指定一个类型。 这些值可能来自于动态的内容，比如来自用户输入或第三方代码库。 这种情况下，我们不希望类型检查器对这些值进行检查而是直接让它们通过编译阶段的检查。 那么我们可以使用 `any` 类型来标记这些变量：
@@ -220,13 +243,14 @@ create(undefined) // Error
 
 有时候你会遇到这样的情况，你会比 TypeScript 更了解某个值的详细信息。 通常这会发生在你清楚地知道一个实体具有比它现有类型更确切的类型。
 
-通过类型断言这种方式可以告诉编译器，“相信我，我知道自己在干什么”。 类型断言好比其它语言里的类型转换，但是不进行特殊的数据检查和解构。 它没有运行时的影响，只是在编译阶段起作用。 TypeScript 会假设你，程序员，已经进行了必须的检查。
+通过类型断言这种方式可以告诉编译器，“相信我，我知道自己在干什么”。 类型断言好比其它语言里的类型转换，但是不进行特殊的数据检查和解构。 它没有运行时的影响，只是在编译阶段起作用。 TypeScript 会假设你已经进行了必须的检查。
 
 类型断言有两种形式。 其一是“尖括号”语法：
 
 ```typescript
 let someValue: any = 'this is a string'
 
+// 把someValue强制转换为string类型
 let strLength: number = (<string>someValue).length
 ```
 
