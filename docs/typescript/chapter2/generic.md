@@ -242,3 +242,31 @@ getProperty(x, 'a') // okay
 getProperty(x, 'm') // error
 ```
 
+再来一个更复杂的例子，使用类类型。
+```typescript
+class BeeKeeper {
+  hasMask: boolean
+}
+class LionKeeper {
+  nametag: string
+}
+class Animal {
+  numLengs: number
+}
+class Bee extends Animal {
+  keeper: BeeKeeper
+}
+class Lion extends Animal {
+  keeper: LionKeeper
+}
+function createInstance<T extends Animal>(c: new () => T): T {
+  return new c()
+}
+
+createInstance(Lion).keeper.nametag  // 都可以推断出来
+createInstance(Bee).keeper.hasMask   // 都可以推断出来
+```
+
+因为`createInstance(Lion)` 是 `Lion`（类的类型），所以有 `keeper`。
+
+因为`createInstance(Lion).keeper`是`LionKeeper`，所以可以推出`nametag`
