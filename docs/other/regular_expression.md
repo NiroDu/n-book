@@ -8,7 +8,7 @@ regex101 支持在正则表达式的不同 flavor 之间切换、解释你的正
 
 [regexr](https://regexr.com/)
 
-## 基础
+## 基础知识
 
 在 Javascript 中，一个正则表达式以 `/` 开头和结尾，所以 `/hello regexp/` 就是一个正则表达式。
 
@@ -133,7 +133,8 @@ var c2 = regex1.exec(string);
 ![regex_8](./images/regex_8.png)
 
 ### Assertion（断言）
-1. `x(?=y)`：仅匹配被y跟随的x；
+
+1. `x(?=y)`：仅匹配被 y 跟随的 x，这个也被称为：“先行断言”/“正向肯定查找”
 
 例如，`/bruce(?=wayne)/`，如果`bruce`后面跟着`wayne`，则匹配`bruce`。
 
@@ -141,11 +142,96 @@ var c2 = regex1.exec(string);
 
 `wayne` 和 `banner` 都不会在匹配结果中出现。
 
-2. `x(?!y)`：仅匹配不被y跟随的x；
+2. `(?<=y)x`：匹配'x'仅当'x'前面是'y'，这个也被称为：“后行断言”
+
+例如，`(?<=bruce)wayne`，如果`wayne`前面是`bruce`，则匹配`wayne`。
+![regex_12](./images/regex_12.png)
+
+`/(?<=bruce|banner)wayne/`，如果`wayne`前面是`bruce`或者`banner`，则匹配`wayne`。
+![regex_13](./images/regex_13.png)
+
+`wayne` 和 `banner` 都不会在匹配结果中出现。
+
+3. `x(?!y)`：仅匹配不被 y 跟随的 x，这个也被称为：“正向否定查找”
 
 例如，`/\d+(?!\.)/` 只会匹配不被 "." 跟随的数字。
 
 `/\d+(?!\.)/.exec('3.141')` 匹配 `141`，而不是 `3.141`
 
+## 非贪婪匹配（non-greedy）
+
+默认情况下，正则表达式的量词`*`、`+`、`？`、`{}`，都是进行贪婪匹配（greedy），即匹配尽可能多的字符。
+
+非贪婪匹配，即匹配尽量少的字符(matching the fewest possible characters)。
+
+怎么理解呢？
+例如这么一段话：`The reading of all good books is like a conversation with the finest men of past centuries.`
+
+使用`/.+\s/`匹配，`.`可以匹配任意字符，而`+`表示匹配 1 次或者多次，默认是贪婪匹配，所以会匹配到了最后一个空格符才结束。
+![regex_10](./images/regex_10.png)
+
+而当我们在量词`*`、`+`、`？`、`{}`后面紧跟着一个`?`，就可以实现非贪婪匹配。
+
+例如`/.+?\s/`，匹配到第一个空格符就会结束：
+![regex_11](./images/regex_11.png)
+
+## 多行匹配
+
+例如下面一段文字：
+
+```
+May God bless and keep you always,
+may your wishes all come true,
+may you always do for others
+and let others do for you.
+may you build a ladder to the stars
+and climb on every rung,
+may you stay forever young,
+forever young, forever young,
+May you stay forever young.
+```
+
+如何匹配以 forever 开头的那句歌词`forever young, forever young`呢？
+
+写`/^forever.+/`是错误的，因为`^`匹配的整个字符串的开始，而是不是每一行的开始。
+
+所以指定`m`选项，即可支持多行匹配，这时`^`和`$`匹配的是每一行的开始和结束，因此正确的正则表达式是`/^forever.+/m`：
+![regex_14](./images/regex_14.png)
+
+## 应用例子
+
+### 1. 匹配手机号码
+
+匹配`1(3/4/5/7/8)开头的11位数字`。
+
+1. 以 1 开头：`/^1/`
+2. 第 2 位为 3、4、5、7、8 中的一个：`/[34578]/` 或 `/(3|4|5|7|8)/`
+3. 剩余 3-11 位均为数字，并以数字结尾：`/\d{9}$/`
+
+组合起来即为 `/^1[34578]\d{9}$/` 或 `/^1(3|4|5|7|8)\d{9}$/`，因为使用捕获括号存在性能损失，所以推荐使用第一种写法。
+
+### 2. 匹配电子邮件
+
+标准的电子邮件组成为 `<yourname>@<domain>.<extension><optional-extension>`。
+
+每部分的格式标准为：
+
+1. `yourname`：任意英文字母（a-z/A-Z）、数字（0-9）、下划线（\_）、英文句点（.）、连字符（-），长度大于 0
+2. `domain`：任意英文字母（a-z/A-Z）、数字（0-9）、连字符（-），长度大于 0
+3. `extension`：任意英文字母（a-z/A-Z），长度 2-8
+4. `optional-extension`："."开头，后面跟任意英文字母（a-z/A-Z），长度 2-8，可选
+
+每部分的正则表达式为：
+
+1. `yourname`：`/[a-z\d._-]+/`
+2. `domain`：`/[a-z\d-]+/`
+3. `extension`：`/[a-z]{2,8}/`
+4. `optional-extension`：`/(\.[a-z]{2,8})?/`
+
+组合起来形成最后的正则表达式：`/^([a-z\d._-]+)@([a-z\d-]+)\.([a-z]{2,8})(\.[a-z]{2,8})?$/ig`；为了增加可读性可以将每部分用`()`包起来，并不要忘记起始和结束符`^$`。
+
+![regex_9](./images/regex_9.png)
+
 ## 参考文章
+
 [segmentfault](https://segmentfault.com/a/1190000018489883)
