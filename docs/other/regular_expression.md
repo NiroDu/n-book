@@ -4,13 +4,13 @@
 
 [regex101](https://regex101.com/)
 
-regex101 支持在正则表达式的不同 flavor 之间切换、解释你的正则表达式、显示匹配信息、提供常用语法参考等功能，非常强大。
-
-[regexr](https://regexr.com/)
+正则的在线工具只推荐regex101，解释正则表达式、显示匹配信息、提供常用语法参考等，足够强大和界面友好。
 
 ## 基础知识
 
-在 Javascript 中，一个正则表达式以 `/` 开头和结尾，所以 `/hello regexp/` 就是一个正则表达式。
+下面开始正式内容，在 Javascript 中，一个正则表达式以 `/` 开头和结尾，所以 `/hello regexp/` 就是一个正则表达式。
+
+正则中有几个大类需要了解：Flags、Character Sets、Quantifiers、Metacharacters、Special Characters、Groups、Assertion，下面我们一一来讲解。
 
 ### Flags（标志符或修饰符）
 
@@ -232,6 +232,9 @@ May you stay forever young.
 
 ![regex_9](./images/regex_9.png)
 
+掌握上面所说的这些内容，日常使用的正则基本不会有什么问题了。
+
 ## 参考文章
 
 [segmentfault](https://segmentfault.com/a/1190000018489883)
+[MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions)
