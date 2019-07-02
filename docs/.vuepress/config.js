@@ -47,7 +47,7 @@ module.exports = {
       '/typescript/': [
         {
           title: '初识 TypeScript',
-          collapsable: false,
+          collapsable: true,
           children: [
             ['/typescript/chapter1/', 'Introduction'],
             '/typescript/chapter1/install',
@@ -56,7 +56,7 @@ module.exports = {
         },
         {
           title: 'TypeScript 常用语法',
-          collapsable: false,
+          collapsable: true,
           children: [
             '/typescript/chapter2/type',
             '/typescript/chapter2/declare',
@@ -69,8 +69,46 @@ module.exports = {
           ]
         },
         {
+          'title': 'ts-axios 项目初始化',
+          collapsable: true,
+          children: [
+            'chapter3/require',
+            'chapter3/init',
+            'chapter3/base'
+          ]
+        },
+        {
+          'title': 'ts-axios 基础功能实现',
+          collapsable: true,
+          children: [
+            'chapter4/url',
+            'chapter4/data',
+            'chapter4/header',
+            'chapter4/response',
+            'chapter4/response-header',
+            'chapter4/response-data'
+          ]
+        },
+        {
+          'title': 'ts-axios 异常情况处理',
+          collapsable: true,
+          children: [
+            'chapter5/error',
+            'chapter5/enhance'
+          ]
+        },
+        {
+          'title': 'ts-axios 接口扩展',
+          collapsable: true,
+          children: [
+            'chapter6/extend',
+            'chapter6/overload',
+            'chapter6/generic'
+          ]
+        },
+        {
           title: "TS",
-          collapsable: false,
+          collapsable: true,
           children: [
             "/typescript/basic_usage.md",
             "/typescript/intermediate_usage.md",
