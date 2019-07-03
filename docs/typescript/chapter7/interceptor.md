@@ -51,7 +51,7 @@ axios.interceptors.request.eject(myInterceptor)
 
 我们先用一张图来展示一下拦截器工作流程：
 
-<img :src="$withBase('/interceptor.png')" alt="interceptor">
+![interceptor](../images/interceptor.png)
 
 整个过程是一个链式调用的方式，并且每个拦截器都可以支持同步和异步处理，我们自然而然地就联想到使用 Promise 链的方式来实现整个调用过程。
 
