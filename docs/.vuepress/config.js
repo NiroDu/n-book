@@ -107,6 +107,43 @@ module.exports = {
           ]
         },
         {
+          'title': 'ts-axios 拦截器实现',
+          collapsable: true,
+          children: [
+            'chapter7/interceptor'
+          ]
+        },
+        {
+          'title': 'ts-axios 配置化实现',
+          collapsable: true,
+          children: [
+            'chapter8/merge',
+            'chapter8/transform',
+            'chapter8/create'
+          ]
+        },
+        {
+          'title': 'ts-axios 取消功能实现',
+          collapsable: true,
+          children: [
+            'chapter9/cancel'
+          ]
+        },
+        {
+          'title': 'ts-axios 更多功能实现',
+          collapsable: true,
+          children: [
+            'chapter10/withCredentials',
+            'chapter10/xsrf',
+            'chapter10/upload-download',
+            'chapter10/auth',
+            'chapter10/validateStatus',
+            'chapter10/paramsSerializer',
+            'chapter10/baseURL',
+            'chapter10/static'
+          ]
+        },
+        {
           title: "TS",
           collapsable: true,
           children: [
