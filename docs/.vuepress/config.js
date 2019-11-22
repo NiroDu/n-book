@@ -38,9 +38,13 @@ module.exports = {
         text: "TypeScript",
         link: "/typescript/"
       },
+      {
+        text: "Python",
+        link: "/python/"
+      },
       { 
         text: "Blog", 
-        link: "http://nirodu.com"
+        link: "https://nirodu.com"
       },
     ],
     sidebar: {
@@ -150,6 +154,16 @@ module.exports = {
             "/typescript/basic_usage.md",
             "/typescript/intermediate_usage.md",
             "/typescript/tips.md"
+          ]
+        },
+      ],
+      '/python/': [
+        {
+          title: '语法速学',
+          collapsable: true,
+          children: [
+            '/python/env',
+            '/python/grammer',
           ]
         },
       ],
