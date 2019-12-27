@@ -137,3 +137,4 @@ alert shows `button`.
 </button>
 ```
 In this case, the inner function's `this` isn't set so it returns the global/window object.
+

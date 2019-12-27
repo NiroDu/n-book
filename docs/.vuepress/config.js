@@ -164,6 +164,7 @@ module.exports = {
           children: [
             '/python/env',
             '/python/grammer',
+            '/python/python3_grammer_wake_up',
           ]
         },
       ],
