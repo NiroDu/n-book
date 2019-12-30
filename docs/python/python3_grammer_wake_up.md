@@ -13,6 +13,11 @@
 print(21 % 10)
 print(2 ** 4)
 print(9 // 2)
+
+# 输出：
+1
+16
+4
 ```
 
 按位运算符是把数字看作二进制来进行计算。
@@ -95,6 +100,10 @@ python中数字有四种类型：整数、布尔型、浮点数和复数。
 x = '12'
 print(type(x))
 print(type(int(x)))
+
+# 输出：
+<class 'str'>
+<class 'int'>
 ```
 
 ### String（字符串）
@@ -154,6 +163,27 @@ print(f'Hello {name}')
 print(f'{1+2}')
 w = {'first': 'Hi', 'second': 'World'}
 print(f'{w["first"]}: {w["second"]}')
+
+# 输出：
+this is a line with 
+
+this is a line with \n
+Hello
+HloWrd
+我叫 小明 今年 10 岁!
+我叫：小明, 今年 12 岁! 
+网站名：菜鸟教程, 地址 www.runoob.com
+网站名：菜鸟教程, 地址 www.runoob.com
+Hello World!Hello World!
+Hello World!Du
+多行字符串可以使用制表符
+TAB ( 	 )。
+也可以使用换行符 [ 
+ ]。
+
+Hello World
+3
+Hi: World
 ```
 
 ### List（列表）
@@ -170,6 +200,12 @@ print ("list2[1:5]: ", list2[1:5])
 print ("list3: ", list3[0])
 print ("list3: ", list3[0]['value'])
 del list[2]
+
+# 输出：
+list1[0]:  Google
+list2[1:5]:  [2, 3, 4, 5]
+list3:  {'value': '1'}
+list3:  1
 ```
 
 **什么是步长？**
@@ -226,6 +262,13 @@ del tuple
 print(tuple)
 
 print(len((1, 2, 3)))
+
+# 输出：
+('a', 'b', 'c', 'd')
+(('a', 'b', 'c', 'd'), (1, 2, 3, 4, 5))
+('a', 'b', 'c', 'd', 1, 2, 3, 4, 5)
+<class 'tuple'>
+3
 ```
 
 构造包含 0 个或 1 个元素的元组比较特殊，所以有一些额外的语法规则：
@@ -286,6 +329,9 @@ print(dict(Runoob=1, Google=2, Taobao=3))
 使用推导式（字典推导）
 ```python
 print({x: x**2 for x in (2, 4, 6)})
+
+# 输出：
+{2: 4, 4: 16, 6: 36}
 ```
 
 **注意：**
@@ -380,7 +426,6 @@ for x in languages:
 
 在字典中遍历时，关键字和对应的值可以使用 `items()` 方法同时解读出来：
 ```python
-
 knights = {'gallahad': 'the pure', 'robin': 'the brave'}
 for key, value in knights.items():
     print(key, value)
@@ -564,19 +609,19 @@ print( b ) ##  结果是 2
 
 传可变对象实例
 ```python
-##  可写函数说明
+#  可写函数说明
 def changeme( mylist ):
    "修改传入的列表"
    mylist.append([1,2,3,4])
    print ("函数内取值: ", mylist)
    return
 
-##  调用changeme函数
+#  调用changeme函数
 mylist = [10,20,30]
 changeme( mylist )
 print ("函数外取值: ", mylist)
-##  输出：函数内取值:  [10, 20, 30, [1, 2, 3, 4]]
-##  输出：函数外取值:  [10, 20, 30, [1, 2, 3, 4]]
+#  输出：函数内取值:  [10, 20, 30, [1, 2, 3, 4]]
+#  输出：函数外取值:  [10, 20, 30, [1, 2, 3, 4]]
 ```
 
 
@@ -1065,11 +1110,12 @@ while True:
         break
     except ValueError:
         print("您输入的不是数字，请再次尝试输入！")
-```
 
+# 输出：
     请输入一个数字: dd
     您输入的不是数字，请再次尝试输入！
     请输入一个数字: 322
+```
 
 
 
@@ -1093,9 +1139,11 @@ except ValueError:
 except:
     print("Unexpected error:", sys.exc_info()[0])
     raise
+
+# 输出：    
+    OS error: [Errno 2] No such file or directory: 'myfile.txt'
 ```
 
-    OS error: [Errno 2] No such file or directory: 'myfile.txt'
 
 
 
