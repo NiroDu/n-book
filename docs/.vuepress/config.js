@@ -148,6 +148,30 @@ module.exports = {
           ]
         },
         {
+          'title': 'ts-axios 单元测试',
+          collapsable: true,
+          children: [
+            'chapter11/preface',
+            'chapter11/jest',
+            'chapter11/helpers',
+            'chapter11/requests',
+            'chapter11/headers',
+            'chapter11/instance',
+            'chapter11/interceptor',
+            'chapter11/mergeConfig',
+            'chapter11/cancel',
+            'chapter11/more'
+          ]
+        },
+        {
+          'title': 'ts-axios 部署与发布',
+          collapsable: true,
+          children: [
+            'chapter12/build-deploy',
+            'chapter12/demo'
+          ]
+        },
+        {
           title: "TS",
           collapsable: true,
           children: [
