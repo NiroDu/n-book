@@ -1,6 +1,6 @@
-# 面试-basic
+# 2018
 
-## Level 1
+## 浏览器
 
 ### **从浏览器地址栏输入url到显示页面的步骤?**
 
@@ -232,7 +232,48 @@ Date: Tue, 19 Feb 2019 08:49:26 GMT
 Connection: keep-alive
 ```
 
-## Level 1 - CSS
+
+### GET和POST的区别
+[GET和POST的区别](https://segmentfault.com/a/1190000018129846)
+
+### e.target与e.currentTarget的区别
+e.target 指向触发事件监听的对象。
+
+e.currentTarget 指向添加监听事件的对象（addEventListener监听的那个对象）。
+
+[解析](https://www.jianshu.com/p/1dd668ccc97a)
+
+### HTML5新增标签
+[MDN](https://developer.mozilla.org/zh-CN/docs/Web/Guide/HTML/HTML5/HTML5_element_list)
+```html
+<section> <nav> <article> <aside> <header> <footer> <main> <template> <figure> <figcaption> <time> <mark> 
+<embed> <video> <audio> <source> <track> <canvas> <svg>
+<math> <progress> <output> 
+```
+
+### DNS预解析/dns-prefetch
+DNS 预解析是一项使浏览器主动去执行域名解析的功能，其范围包括文档的所有链接，无论是图片的，CSS 的，还是 JavaScript 等其他用户能够点击的 URL。因为预读取会在后台执行，所以 DNS 很可能在链接对应的东西出现之前就已经解析完毕。这能够减少用户点击链接时的延迟。
+
+在某些浏览器中这个预读取的行为将会与页面实际内容并行发生（而不是串行）。正因如此，某些高延迟的域名的解析过程才不会卡住资源的加载。
+这样可以极大的加速（尤其是移动网络环境下）页面的加载。在某些图片较多的页面中，在发起图片加载请求之前预先把域名解析好将会有至少 5% 的图片加载速度提升。
+
+**打开和关闭 DNS 预解析**
+1. 第一种方式，服务端返回的 `X-DNS-Prefetch-Control` 报头开启，或是在文档中使用值为 `http-equiv` 的 `<meta>` 标签：
+```html
+<meta http-equiv="x-dns-prefetch-control" content="on">
+```
+通过将 `content` 的参数设置为`on`或 `off` 来开启或关闭。
+
+2. 第二种方式，可以通过使用 `rel` 为 `dns-prefetch` ，在 `<link>` 标签上对特定域名进行预读取：
+```html
+<link rel="dns-prefetch" href="//www.spreadfirefox.com/">
+```
+
+另外需要注意的是，**浏览器会对a标签的href自动启用DNS Prefetching，所以a标签里包含的域名不需要在head中手动设置link。但是在HTTPS下不起作用，需要meta来强制开启功能。**
+
+这个限制的原因是防止窃听者根据`DNS Prefetching`推断显示在HTTPS页面中超链接的主机名。
+
+## CSS
 ### 什么是FOUC?如何避免
 `Flash Of Unstyled Content`：用户定义样式表加载之前浏览器使用默认样式显示文档，用户样式加载渲染之后再从新显示文档，造成页面闪烁。
 
@@ -252,8 +293,10 @@ Connection: keep-alive
 
 [BFC - MDN](https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context)
 
+### BFC
+[深入理解BFC](http://www.cnblogs.com/xiaohuochai/p/5248536.html)
 
-## Level 1 - JavaScript
+## JavaScript
 ### Javascript如何实现继承？
 
 ### 事件模型
@@ -508,88 +551,3 @@ Function.prototype.bind = function(ctx) {
 	};
 };
 ```
-
-### GET和POST的区别
-好 - [GET和POST的区别](https://segmentfault.com/a/1190000018129846)
-
-### BFC
-[深入理解BFC](http://www.cnblogs.com/xiaohuochai/p/5248536.html)
-
-### 第 18 题：React 中 setState 什么时候是同步的，什么时候是异步的？
-在 React 中，如果是由 React 引发的事件处理（比如通过 onClick 引发的事件处理），调用 setState 不会同步更新 this.state，除此之外的 setState 调用会同步执行 this.state。所谓“除此之外”，指的是绕过 React 通过 addEventListener 直接添加的事件处理函数，还有通过 setTimeout/setInterval 产生的异步调用。
-
-**原因：** 在 React 的 setState 函数实现中，会根据一个变量 isBatchingUpdates 判断是直接更新 this.state 还是放到队列中回头再说，而 isBatchingUpdates 默认是 false，也就表示 setState 会同步更新 this.state，但是，有一个函数 batchedUpdates，这个函数会把 isBatchingUpdates 修改为t rue，而当 React 在调用事件处理函数之前就会调用这个 batchedUpdates，造成的后果就是由 React 控制的事件处理过程 setState 不会同步更新 this.state。
-
-[更多解析](https://github.com/Advanced-Frontend/Daily-Interview-Question/issues/17)
-
-### 第 19 题：React setState 笔试题，下面的代码输出什么？
-```js
-class Example extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      val: 0
-    };
-  }
-  componentDidMount() {
-    this.setState({val: this.state.val + 1});
-    console.log(this.state.val);    // 第 1 次 log
-
-    this.setState({val: this.state.val + 1});
-    console.log(this.state.val);    // 第 2 次 log
-
-    setTimeout(() => {
-      this.setState({val: this.state.val + 1});
-      console.log(this.state.val);  // 第 3 次 log
-
-      this.setState({val: this.state.val + 1});
-      console.log(this.state.val);  // 第 4 次 log
-    }, 0);
-  }
-  render() {
-    return null;
-  }
-};
-```
-解析：
-
-1、第一次和第二次都是在 react 自身生命周期内，触发时 isBatchingUpdates 为 true，所以并不会直接执行更新 state，而是加入了 dirtyComponents，所以打印时获取的都是更新前的状态 0。
-
-2、两次 setState 时，获取到 this.state.val 都是 0，所以执行时都是将 0 设置成 1，在 react 内部会被合并掉，只执行一次。设置完成后 state.val 值为 1。
-
-3、setTimeout 中的代码，触发时 isBatchingUpdates 为 false，所以能够直接进行更新，所以连着输出 2，3。
-
-输出： 0 0 2 3
-
-[更多解析](https://github.com/Advanced-Frontend/Daily-Interview-Question/issues/18)
-
-### Vue 面试题
-[Vue面试中，经常会被问到的面试题/Vue知识点整理](https://segmentfault.com/a/1190000016344599)
-
-### e.target与e.currentTarget的区别
-e.target 指向触发事件监听的对象。
-
-e.currentTarget 指向添加监听事件的对象（addEventListener监听的那个对象）。
-
-[解析](https://www.jianshu.com/p/1dd668ccc97a)
-
-### HTML5新增标签
-[MDN](https://developer.mozilla.org/zh-CN/docs/Web/Guide/HTML/HTML5/HTML5_element_list)
-```html
-<section> <nav> <article> <aside> <header> <footer> <main> <template> <figure> <figcaption> <time> <mark> 
-<embed> <video> <audio> <source> <track> <canvas> <svg>
-<math> <progress> <output> 
-```
-
-### 预解析DNS
-资源预加载是另一个性能优化技术，我们可以使用该技术来预先告知浏览器某些资源可能在将来会被使用到。
-
-通过 DNS 预解析来告诉浏览器未来我们可能从某个特定的 URL 获取资源，当浏览器真正使用到该域中的某个资源时就可以尽快地完成 DNS 解析。例如，我们将来可从 example.com 获取图片或音频资源，那么可以在文档顶部的 标签中加入以下内容：
-
-`<link rel="dns-prefetch" href="//example.com">`
-
-当我们从该 URL 请求一个资源时，就不再需要等待 DNS 的解析过程。该技术对使用第三方资源特别有用。通过简单的一行代码就可以告知那些兼容的浏览器进行 DNS 预解析，这意味着当浏览器真正请求该域中的某个资源时，DNS 的解析就已经完成了,从而节省了宝贵的时间。
-
-另外需要注意的是，**浏览器会对a标签的href自动启用DNS Prefetching，所以a标签里包含的域名不需要在head中手动设置link。但是在HTTPS下不起作用，需要meta来强制开启功能。**这个限制的原因是防止窃听者根据DNS Prefetching推断显示在HTTPS页面中超链接的主机名。下面这句话作用是强制打开a标签域名解析：
-
-`<meta http-equiv="x-dns-prefetch-control" content="on">`

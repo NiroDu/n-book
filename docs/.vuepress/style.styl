@@ -25,3 +25,10 @@ a.sidebar-link:hover
   border-radius: 2px;
 .sidebar .sidebar-sub-headers
   font-size: 0.9em;
+div[class*="language-"]
+  background-color: #333;
+div[class*="language-"].line-numbers-mode pre::-webkit-scrollbar
+  width: 0 !important;
+div[class*="language-"].line-numbers-mode pre
+  -ms-overflow-style: none;
+  overflow: -moz-scrollbars-none;

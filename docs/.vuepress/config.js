@@ -3,7 +3,7 @@ module.exports = {
   title: "N-book",
   description: "记录一些技术方面的文章",
   markdown: {
-    lineNumbers: true
+    lineNumbers: true,
   },
   port: 8084,
   head: [
@@ -13,9 +13,9 @@ module.exports = {
     ["meta", { name: "apple-mobile-web-app-capable", content: "yes" }],
     [
       "meta",
-      { name: "apple-mobile-web-app-status-bar-style", content: "black" }
+      { name: "apple-mobile-web-app-status-bar-style", content: "black" },
     ],
-    ["meta", { name: "msapplication-TileColor", content: "#000000" }]
+    ["meta", { name: "msapplication-TileColor", content: "#000000" }],
   ],
   themeConfig: {
     repo: "NiroDu/N-book",
@@ -27,149 +27,131 @@ module.exports = {
     lastUpdated: "上次更新",
     algolia: {
       apiKey: "d08f9a5b1bc67cc33d3420f0e97c9c8c",
-      indexName: "n_book"
+      indexName: "n_book",
     },
     nav: [
       {
         text: "Home",
-        link: "/"
+        link: "/",
       },
       {
         text: "TypeScript",
-        link: "/typescript/"
+        link: "/typescript/",
       },
       {
         text: "Python",
-        link: "/python/"
+        link: "/python/",
       },
-      { 
-        text: "Blog", 
-        link: "https://nirodu.com"
+      {
+        text: "Blog",
+        link: "https://nirodu.com",
       },
     ],
     sidebar: {
-      '/typescript/': [
+      "/typescript/": [
         {
-          title: '初识 TypeScript',
+          title: "初识 TypeScript",
           collapsable: true,
           children: [
-            ['/typescript/chapter1/', 'Introduction'],
-            '/typescript/chapter1/install',
-            '/typescript/chapter1/start'
-          ]
+            ["/typescript/chapter1/", "Introduction"],
+            "/typescript/chapter1/install",
+            "/typescript/chapter1/start",
+          ],
         },
         {
-          title: 'TypeScript 常用语法',
+          title: "TypeScript 常用语法",
           collapsable: true,
           children: [
-            '/typescript/chapter2/type',
-            '/typescript/chapter2/declare',
-            '/typescript/chapter2/interface',
-            '/typescript/chapter2/class',
-            '/typescript/chapter2/function',
-            '/typescript/chapter2/generic',
-            '/typescript/chapter2/inference',
-            '/typescript/chapter2/advance'
-          ]
+            "/typescript/chapter2/type",
+            "/typescript/chapter2/declare",
+            "/typescript/chapter2/interface",
+            "/typescript/chapter2/class",
+            "/typescript/chapter2/function",
+            "/typescript/chapter2/generic",
+            "/typescript/chapter2/inference",
+            "/typescript/chapter2/advance",
+          ],
         },
         {
-          'title': 'ts-axios 项目初始化',
+          title: "ts-axios 项目初始化",
           collapsable: true,
-          children: [
-            'chapter3/require',
-            'chapter3/init',
-            'chapter3/base'
-          ]
+          children: ["chapter3/require", "chapter3/init", "chapter3/base"],
         },
         {
-          'title': 'ts-axios 基础功能实现',
+          title: "ts-axios 基础功能实现",
           collapsable: true,
           children: [
-            'chapter4/url',
-            'chapter4/data',
-            'chapter4/header',
-            'chapter4/response',
-            'chapter4/response-header',
-            'chapter4/response-data'
-          ]
+            "chapter4/url",
+            "chapter4/data",
+            "chapter4/header",
+            "chapter4/response",
+            "chapter4/response-header",
+            "chapter4/response-data",
+          ],
         },
         {
-          'title': 'ts-axios 异常情况处理',
+          title: "ts-axios 异常情况处理",
           collapsable: true,
-          children: [
-            'chapter5/error',
-            'chapter5/enhance'
-          ]
+          children: ["chapter5/error", "chapter5/enhance"],
         },
         {
-          'title': 'ts-axios 接口扩展',
+          title: "ts-axios 接口扩展",
           collapsable: true,
           children: [
-            'chapter6/extend',
-            'chapter6/overload',
-            'chapter6/generic'
-          ]
+            "chapter6/extend",
+            "chapter6/overload",
+            "chapter6/generic",
+          ],
         },
         {
-          'title': 'ts-axios 拦截器实现',
+          title: "ts-axios 拦截器实现",
           collapsable: true,
-          children: [
-            'chapter7/interceptor'
-          ]
+          children: ["chapter7/interceptor"],
         },
         {
-          'title': 'ts-axios 配置化实现',
+          title: "ts-axios 配置化实现",
           collapsable: true,
-          children: [
-            'chapter8/merge',
-            'chapter8/transform',
-            'chapter8/create'
-          ]
+          children: ["chapter8/merge", "chapter8/transform", "chapter8/create"],
         },
         {
-          'title': 'ts-axios 取消功能实现',
+          title: "ts-axios 取消功能实现",
           collapsable: true,
-          children: [
-            'chapter9/cancel'
-          ]
+          children: ["chapter9/cancel"],
         },
         {
-          'title': 'ts-axios 更多功能实现',
+          title: "ts-axios 更多功能实现",
           collapsable: true,
           children: [
-            'chapter10/withCredentials',
-            'chapter10/xsrf',
-            'chapter10/upload-download',
-            'chapter10/auth',
-            'chapter10/validateStatus',
-            'chapter10/paramsSerializer',
-            'chapter10/baseURL',
-            'chapter10/static'
-          ]
+            "chapter10/withCredentials",
+            "chapter10/xsrf",
+            "chapter10/upload-download",
+            "chapter10/auth",
+            "chapter10/validateStatus",
+            "chapter10/paramsSerializer",
+            "chapter10/baseURL",
+            "chapter10/static",
+          ],
         },
         {
-          'title': 'ts-axios 单元测试',
+          title: "ts-axios 单元测试",
           collapsable: true,
           children: [
-            'chapter11/preface',
-            'chapter11/jest',
-            'chapter11/helpers',
-            'chapter11/requests',
-            'chapter11/headers',
-            'chapter11/instance',
-            'chapter11/interceptor',
-            'chapter11/mergeConfig',
-            'chapter11/cancel',
-            'chapter11/more'
-          ]
+            "chapter11/preface",
+            "chapter11/jest",
+            "chapter11/helpers",
+            "chapter11/requests",
+            "chapter11/headers",
+            "chapter11/instance",
+            "chapter11/interceptor",
+            "chapter11/mergeConfig",
+            "chapter11/cancel",
+            "chapter11/more",
+          ],
         },
         {
-          'title': 'ts-axios 部署与发布',
+          title: "ts-axios 部署与发布",
           collapsable: true,
-          children: [
-            'chapter12/build-deploy',
-            'chapter12/demo'
-          ]
+          children: ["chapter12/build-deploy", "chapter12/demo"],
         },
         {
           title: "TS",
@@ -177,25 +159,22 @@ module.exports = {
           children: [
             "/typescript/basic_usage.md",
             "/typescript/intermediate_usage.md",
-            "/typescript/tips.md"
-          ]
+            "/typescript/tips.md",
+          ],
         },
       ],
-      '/python/': [
+      "/python/": [
         {
-          title: '语法速学',
+          title: "语法速学",
           collapsable: true,
-          children: [
-            '/python/env',
-            '/python/python3_grammer_wake_up',
-          ]
+          children: ["/python/env", "/python/python3_grammer_wake_up"],
         },
       ],
-      '/': [
+      "/": [
         {
-          title: "写在前面",
+          // title: "写在前面",
           collapsable: false,
-          children: ["/"]
+          children: ["/"],
         },
         {
           title: "JavaScripts专栏",
@@ -212,8 +191,8 @@ module.exports = {
             "/javascript/promise.md",
             "/javascript/asynchronous_function.md",
             "/javascript/es6_classes.md",
-            "/javascript/iife.md"
-          ]
+            "/javascript/iife.md",
+          ],
         },
         {
           title: "React 专栏",
@@ -225,13 +204,13 @@ module.exports = {
             "/react/libs_with_react.md",
             "/react/react_ssr.md",
             "/react/redux_createstore.md",
-            "/react/react_context.md"
-          ]
+            "/react/react_context.md",
+          ],
         },
         {
           title: "Vue 专栏",
           collapsable: true,
-          children: ["/vue/IIS.md"]
+          children: ["/vue/IIS.md"],
         },
         {
           title: "Webpack 专栏",
@@ -239,8 +218,8 @@ module.exports = {
           children: [
             "/webpack/webpack_basic.md",
             "/webpack/webpack_intermediate.md",
-            "/webpack/webpack_advanced.md"
-          ]
+            "/webpack/webpack_advanced.md",
+          ],
         },
         {
           title: "TypeScript 专栏",
@@ -248,13 +227,23 @@ module.exports = {
           children: [
             "/typescript/basic_usage.md",
             "/typescript/intermediate_usage.md",
-            "/typescript/tips.md"
-          ]
+            "/typescript/tips.md",
+          ],
+        },
+        {
+          title: "自动化测试",
+          collapsable: true,
+          children: ["/testing/basic_principle.md", "/testing/jest_basic.md", "/testing/jest_advanced.md"],
         },
         {
           title: "性能优化",
           collapsable: true,
-          children: ["/performance/cache.md"]
+          children: ["/performance/cache.md"],
+        },
+        {
+          title: "CSS",
+          collapsable: true,
+          children: ["/css/2020-05-14-flexbox.md"],
         },
         {
           title: "Interview 专栏",
@@ -263,8 +252,8 @@ module.exports = {
             "/interview/2018_basic.md",
             "/interview/js_question.md",
             "/interview/interview_error.md",
-            "/interview/MDN_note.md"
-          ]
+            "/interview/MDN_note.md",
+          ],
         },
         {
           title: "其他",
@@ -272,10 +261,10 @@ module.exports = {
           children: [
             "/other/regular_expression.md",
             "/other/yarn_npm_resource_change.md",
-            "/other/common_commands.md"
-          ]
-        }
-      ]
-    }
-  }
+            "/other/common_commands.md",
+          ],
+        },
+      ],
+    },
+  },
 };
