@@ -7,7 +7,7 @@ yarn build
 cd docs/.vuepress/dist
 
 # 如果是发布到自定义域名
-echo 'nirodu.com' > CNAME
+echo 'nirodu.fun' > CNAME
 
 git init
 git config user.name 'nirodu'
