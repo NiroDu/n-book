@@ -8,7 +8,7 @@ module.exports = {
   port: 8084,
   head: [
     ["link", { rel: "icon", href: `/logo.png` }],
-    ["link", { rel: "manifest", href: "/manifest.json" }],
+    // ["link", { rel: "manifest", href: "/manifest.json" }],
     ["meta", { name: "theme-color", content: "#3eaf7c" }],
     ["meta", { name: "apple-mobile-web-app-capable", content: "yes" }],
     [
@@ -44,7 +44,7 @@ module.exports = {
       },
       {
         text: "Blog",
-        link: "https://nirodu.com",
+        link: "https://nirodu.fun",
       },
     ],
     sidebar: {
@@ -210,7 +210,7 @@ module.exports = {
         {
           title: "Vue 专栏",
           collapsable: true,
-          children: ["/vue/IIS.md"],
+          children: ["/vue/iis.md"],
         },
         {
           title: "Webpack 专栏",
@@ -252,7 +252,7 @@ module.exports = {
             "/interview/2018_basic.md",
             "/interview/js_question.md",
             "/interview/interview_error.md",
-            "/interview/MDN_note.md",
+            "/interview/mdn_note.md",
           ],
         },
         {
