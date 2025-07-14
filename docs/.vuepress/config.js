@@ -42,10 +42,10 @@ module.exports = {
         text: "Python",
         link: "/python/",
       },
-      {
-        text: "Blog",
-        link: "https://nirodu.fun",
-      },
+      // {
+      //   text: "Blog",
+      //   link: "https://nirodu.fun",
+      // },
     ],
     sidebar: {
       "/typescript/": [
@@ -191,7 +191,7 @@ module.exports = {
             "/javascript/promise.md",
             "/javascript/asynchronous_function.md",
             "/javascript/es6_classes.md",
-            "/javascript/iife.md",
+            "/javascript/IIFE.md",
           ],
         },
         {
@@ -210,7 +210,7 @@ module.exports = {
         {
           title: "Vue 专栏",
           collapsable: true,
-          children: ["/vue/iis.md"],
+          children: ["/vue/IIS.md"],
         },
         {
           title: "Webpack 专栏",
@@ -252,7 +252,7 @@ module.exports = {
             "/interview/basic_2018.md",
             "/interview/js_question.md",
             "/interview/interview_error.md",
-            "/interview/mdn_note.md",
+            "/interview/MDN_note.md",
           ],
         },
         {
