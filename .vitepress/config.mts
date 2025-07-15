@@ -27,7 +27,7 @@ export default defineConfig({
   ],
   // 主题配置
   themeConfig: {
-    logo: "/logo.png",
+    logo: "/wing.png",
 
     // 目录配置 - 显示到三级标题
     outline: {
@@ -38,7 +38,7 @@ export default defineConfig({
     // 导航栏配置
     nav: [
       { text: "Home", link: "/" },
-      { text: "TypeScript", link: "/typescript/chapter1/readme" },
+      { text: "TypeScript", link: "/typescript/chapter1/README" },
       { text: "Python", link: "/python/env" },
     ],
 
@@ -69,7 +69,7 @@ export default defineConfig({
             { text: "Promise", link: "/javascript/promise" },
             { text: "异步函数", link: "/javascript/asynchronous_function" },
             { text: "ES6 类", link: "/javascript/es6_classes" },
-            { text: "IIFE", link: "/javascript/iife" },
+            { text: "IIFE", link: "/javascript/IIFE" },
           ],
         },
         {
@@ -88,7 +88,7 @@ export default defineConfig({
         {
           text: "Vue 专栏",
           collapsed: true,
-          items: [{ text: "IIS 配置", link: "/vue/iis" }],
+          items: [{ text: "IIS 配置", link: "/vue/IIS" }],
         },
         {
           text: "Webpack 专栏",
