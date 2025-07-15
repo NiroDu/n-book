@@ -1,14 +1,14 @@
 {
   "name": "niro-front-end-book",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "技术相关的文章集",
-  "main": "index.js",
-  "directories": {
-    "doc": "docs"
+  "devDependencies": {
+    "vitepress": "^1.6.3"
   },
   "scripts": {
-    "start": "vuepress dev docs",
-    "build": "vuepress build docs",
+    "dev": "vitepress dev",
+    "build": "vitepress build",
+    "preview": "vitepress preview",
     "deploy": "sh build/deploy.sh"
   },
   "repository": {
@@ -22,13 +22,10 @@
     "vue",
     "typescript"
   ],
-  "author": "",
+  "author": "NiroDu",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/NiroDu/n-book/issues"
   },
-  "homepage": "https://github.com/NiroDu/n-book#readme",
-  "devDependencies": {
-    "vuepress": "^0.14.2"
-  }
+  "homepage": "https://github.com/NiroDu/n-book#readme"
 }

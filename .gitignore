@@ -7,3 +7,6 @@ node_modules
 dist
 
 .history
+
+.vitepress/dist
+.vitepress/cache

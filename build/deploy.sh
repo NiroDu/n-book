@@ -4,10 +4,10 @@
 yarn build
 
 # 进入生成的文件夹
-cd docs/.vuepress/dist
+cd .vitepress/dist
 
 # 如果是发布到自定义域名
-echo 'nirodu.fun' > CNAME
+# echo 'nirodu.fun' > CNAME
 
 git init
 git config user.name 'nirodu'

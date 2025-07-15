@@ -123,6 +123,7 @@ function flatten(arr){
 }
 flatten(arr);
 ```
+
 ## 4. 如何渲染几万条数据并不卡住界面
 这道题考察了如何在不卡住页面的情况下渲染数据，也就是说不能一次性将几万条都渲染出来，而应该一次渲染部分 DOM，那么就可以通过 `requestAnimationFrame` 来每 16 ms 刷新一次
 ```js
@@ -159,7 +160,7 @@ setTimeout(() => {
 ```
 
 ## 5. 数组去重方法十一法
-**方法一、利用ES6 Set去重**
+**方法一、利用ES6 Set去重**
 ```js
 function unique (arr) {
   return Array.from(new Set(arr))
@@ -186,6 +187,7 @@ function unique(arr){
 var arr = [1,1,'true','true',true,true,15,15,false,false, undefined,undefined, null,null, NaN, NaN,'NaN', 0, 0, 'a', 'a',{},{}];
 console.log(unique(arr))
 ```
+
 **方法三、利用includes**
 ```js
 function unique(arr) {
@@ -204,6 +206,7 @@ function unique(arr) {
 var arr = [1,1,'true','true',true,true,15,15,false,false, undefined,undefined, null,null, NaN, NaN,'NaN', 0, 0, 'a', 'a',{},{}];
 unique(arr)
 ```
+
 **最简短方法**
 ```js
  var arr = [1,1,'true','true',true,true,15,15,false,false, undefined,undefined, null,null, NaN, NaN,'NaN', 0, 0, 'a', 'a',{},{}];
@@ -214,7 +217,8 @@ unique(arr)
 
 
 ## 6. 写一段JS程序提取URL中的各个GET参数
-有这样一个URL：http://item.taobao.com/item.htm?a=1&b=2&c=&d=xxx&e，请写一段JS程序提取URL中的各个GET参数(参数名和参数个数不确定)，将其按key-value形式返回到一个json结构中，如{a:’1′, b:’2′, c:”, d:’xxx’, e:undefined}
+有这样一个URL：`http://item.taobao.com/item.htm?a=1&b=2&c=&d=xxx&e`，请写一段JS程序提取URL中的各个GET参数(参数名和参数个数不确定)，将其按key-value形式返回到一个json结构中，如`{a:'1', b:'2', c:'', d:'xxx', e:undefined}`
+
 ```js
 function serilizeUrl(url) {
   var result = {};
